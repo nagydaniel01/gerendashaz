@@ -1,0 +1,40 @@
+.logo {
+  .logo__image {
+    display: block;
+    width: auto;
+    transition: $transition-base;
+    outline: none;
+  }
+
+  &.logo--header {
+    flex: 0 0 auto;
+    margin-right: auto;
+    color: $white;
+    
+    .logo__image {
+      height: 32px;
+    }
+  }
+  
+  &.logo--footer {
+    display: inline-block;
+    margin-bottom: 1.75rem;
+    color: $white;
+
+    .logo__image {
+      height: 56px;
+    }
+  }
+}
+
+@include media-breakpoint-up(xl) {
+  .logo {
+    &.logo--header {
+      margin-right: 2.5rem;
+
+      .logo__image {
+        height: 44px;
+      }
+    }
+  }
+}

@@ -1,0 +1,152 @@
+<?php
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+    }
+
+    if ( ! function_exists('mc_form_handler') ) {
+        /**
+         * Handles AJAX submissions for the Mailchimp subscription form.
+         *
+         * This function processes POST requests submitted via AJAX for subscribing users to a Mailchimp list.
+         * It performs the following steps:
+         *   1. Validates that the request method is POST.
+         *   2. Checks for the presence of form data.
+         *   3. Parses serialized form data into an associative array.
+         *   4. Verifies the security nonce.
+         *   5. Sanitizes and validates form fields (name, email, privacy consent).
+         *   6. Subscribes the user to Mailchimp using the MailchimpService class.
+         *   7. Returns a JSON response indicating success or failure.
+         *
+         * @return void Outputs a JSON response and terminates execution.
+         */
+        function mc_form_handler() {
+            try {
+                // Ensure Mailchimp credentials are available
+                $api_key      = get_field('mailchimp_api_key', 'option') ?: MAILCHIMP_API_KEY;
+                $audience_id  = get_field('mailchimp_audience_id', 'option') ?: MAILCHIMP_AUDIENCE_ID;
+
+                if ( empty($api_key) || empty($audience_id) ) {
+                    wp_send_json_error([
+                        'message' => __('Mailchimp configuration is missing. Please contact site administrator.', 'gerendashaz')
+                    ], 500);
+                }
+
+                // Mailchimp subscription
+                $mailchimp = new MailchimpService($api_key, $audience_id);
+
+                // Ensure the request method is POST
+                if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+                    wp_send_json_error([
+                        'message' => __('Invalid request method.', 'gerendashaz')
+                    ], 405);
+                }
+
+                // Check if form data is present
+                if ( empty($_POST['form_data']) ) {
+                    wp_send_json_error([
+                        'message' => __('No form data received.', 'gerendashaz')
+                    ], 400);
+                }
+
+                // Parse serialized form data into an associative array
+                $form = [];
+                if ( isset($_POST['form_data']) ) {
+                    parse_str($_POST['form_data'], $form);
+                }
+
+                // Get reCAPTCHA token
+                $recaptcha_token = isset($form['recaptcha_token']) ? sanitize_text_field($form['recaptcha_token']) : '';
+
+                if (empty($recaptcha_token)) {
+                    wp_send_json_error(['message' => __('reCAPTCHA verification failed (missing token).', 'gerendashaz')], 400);
+                }
+
+                // Send verification request to Google
+                $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', [
+                    'body' => [
+                        'secret'   => RECAPTCHA_SECRET_KEY,
+                        'response' => $recaptcha_token,
+                    ],
+                    'timeout' => 10
+                ]);
+
+                if (is_wp_error($response)) {
+                    wp_send_json_error(['message' => __('Unable to verify reCAPTCHA (request failed).', 'gerendashaz')], 400);
+                }
+
+                // Decode Google API response
+                $recaptcha = json_decode(wp_remote_retrieve_body($response), true);
+
+                // Log score for debugging
+                //error_log('reCAPTCHA score: ' . ($recaptcha['score'] ?? 'null'));
+
+                // If reCAPTCHA fails OR score too low → possible bot
+                if ( empty($recaptcha['success']) || ($recaptcha['score'] ?? 0) < 0.3 ) {
+                    wp_send_json_error([
+                        'message' => __('Suspicious activity detected. reCAPTCHA failed.', 'gerendashaz')
+                    ], 403);
+                }
+
+                // Nonce verification for security
+                if ( ! isset($form['subscribe_form_nonce']) || ! wp_verify_nonce($form['subscribe_form_nonce'], 'subscribe_form_action') ) {
+                    wp_send_json_error([
+                        'message' => __('Invalid security token.', 'gerendashaz')
+                    ], 403);
+                }
+
+                // Extract and sanitize form fields
+                $user_id = get_current_user_id();
+                $name    = isset($form['mc_name']) ? sanitize_text_field($form['mc_name']) : '';
+                $email   = isset($form['mc_email']) ? sanitize_email($form['mc_email']) : '';
+                $privacy = isset($form['mc_privacy_policy']) ? sanitize_text_field($form['mc_privacy_policy']) : '';
+
+                // Validate required fields
+                if ( empty($name) || empty($email) ) {
+                    wp_send_json_error(['message' => __('All required fields must be filled out.', 'gerendashaz')], 422);
+                }
+
+                // Validate email
+                if ( ! is_email($email) ) {
+                    wp_send_json_error(['message' => __('Invalid email format.', 'gerendashaz')], 422);
+                }
+
+                // Validate privacy consent
+                if ( empty($privacy) || $privacy !== 'on' ) {
+                    wp_send_json_error(['message' => __('You must agree to the privacy policy.', 'gerendashaz')], 422);
+                }
+
+                $subscribe = $mailchimp->subscribe($email, $name, '', ['webshop'], 'subscribed');
+
+                // Handle Mailchimp errors safely
+                if ( is_wp_error($subscribe) ) {
+                    error_log('Mailchimp WP_Error: ' . $subscribe->get_error_message());
+                    wp_send_json_error([
+                        'message' => __('Mailchimp request failed. Please try again later.', 'gerendashaz')
+                    ], 500);
+                }
+
+                if ( empty($subscribe['success']) ) {
+                    wp_send_json_error([
+                        'message' => $subscribe['message'] ?? __('You could not be subscribed. Please try again later.', 'gerendashaz')
+                    ], 500);
+                }
+
+                // Success response
+                wp_send_json_success([
+                    'message'      => $subscribe['message'],
+                    'redirect_url' => esc_url(trailingslashit(home_url('/thank-you'))),
+                    'email'        => $email
+                ], 200);
+
+            } catch ( Exception $e ) {
+                // Catch any unexpected errors
+                wp_send_json_error([
+                    'message' => sprintf(__('Unexpected error: %s', 'gerendashaz'), $e->getMessage())
+                ], 500);
+            }
+        }
+
+    // Register AJAX handlers
+    add_action('wp_ajax_mc_form_handler', 'mc_form_handler');
+    add_action('wp_ajax_nopriv_mc_form_handler', 'mc_form_handler');
+}

@@ -1,0 +1,90 @@
+.woocommerce-notices-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: .625rem;
+  margin-bottom: 1rem;
+}
+
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error {
+  @extend .alert;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+  //margin-left: 0;
+  padding: 1rem 1.875rem 1rem 3.75rem;
+  list-style: none outside;
+  line-height: 2rem;
+  clear: both;
+
+  .button {
+    @extend .btn-sm;
+    float: right;
+  }
+
+  a {
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  &.is-dismissible {
+    @extend .alert-dismissible;
+    padding-right: 3rem;
+
+    .close,
+    .btn-close {
+      position: absolute;
+      top: .5rem;
+      right: .75rem;
+    }
+  }
+
+  &::before {
+    position: absolute;
+    top: 50%;
+    left: 1.25rem;
+    transform: translateY(-50%);
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: .5rem;
+    vertical-align: middle;
+    content: "";
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: currentColor;
+  }
+
+  &.woocommerce-message {
+    @extend .alert-success;
+
+    &::before {
+      mask-image: url('./../../src/svg/circle-check.svg');
+      -webkit-mask-image: url('./../../src/svg/circle-check.svg');
+    }
+  }
+
+  &.woocommerce-info {
+    @extend .alert-info;
+
+    &::before {
+      mask-image: url('./../../src/svg/circle-info.svg');
+      -webkit-mask-image: url('./../../src/svg/circle-info.svg');
+    }
+  }
+
+  &.woocommerce-error {
+    @extend .alert-danger;
+
+    &::before {
+      mask-image: url('./../../src/svg/circle-xmark.svg');
+      -webkit-mask-image: url('./../../src/svg/circle-xmark.svg');
+    }
+  }
+}

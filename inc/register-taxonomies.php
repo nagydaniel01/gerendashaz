@@ -1,0 +1,64 @@
+<?php
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+    }
+	
+	if ( ! function_exists( 'register_award_taxonomy' ) ) {
+		/**
+		 * Registers a custom taxonomy 'award'.
+		 * 
+		 * This taxonomy is applied to posts and custom post types.
+		 * It is non-hierarchical and has a default term.
+		 */
+		function register_award_taxonomy() {
+			$labels = array(
+				'name'                       => _x( 'Awards', 'Taxonomy General Name', 'gerendashaz' ),
+				'singular_name'              => _x( 'Award', 'Taxonomy Singular Name', 'gerendashaz' ),
+				'menu_name'                  => __( 'Awards', 'gerendashaz' ),
+				'all_items'                  => __( 'All Awards', 'gerendashaz' ),
+				'parent_item'                => __( 'Parent Award', 'gerendashaz' ),
+				'parent_item_colon'          => __( 'Parent Award:', 'gerendashaz' ),
+				'new_item_name'              => __( 'New Award Name', 'gerendashaz' ),
+				'add_new_item'               => __( 'Add New Award', 'gerendashaz' ),
+				'edit_item'                  => __( 'Edit Award', 'gerendashaz' ),
+				'update_item'                => __( 'Update Award', 'gerendashaz' ),
+				'view_item'                  => __( 'View Award', 'gerendashaz' ),
+				'separate_items_with_commas' => __( 'Separate awards with commas', 'gerendashaz' ),
+				'add_or_remove_items'        => __( 'Add or remove awards', 'gerendashaz' ),
+				'choose_from_most_used'      => __( 'Choose from the most used awards', 'gerendashaz' ),
+				'popular_items'              => __( 'Popular Awards', 'gerendashaz' ),
+				'search_items'               => __( 'Search Awards', 'gerendashaz' ),
+				'not_found'                  => __( 'Not found', 'gerendashaz' ),
+				'no_terms'                   => __( 'No awards', 'gerendashaz' ),
+				'items_list'                 => __( 'Awards list', 'gerendashaz' ),
+				'items_list_navigation'      => __( 'Awards list navigation', 'gerendashaz' ),
+			);
+
+			$rewrite = array(
+				'slug'                       => 'award',
+				'with_front'                 => true,
+				'hierarchical'               => false,
+			);
+
+			$default_term = array(
+				'name'        => __( 'Other', 'gerendashaz' ),
+				'slug'        => _x( 'other', 'URL slug for default term', 'gerendashaz' ),
+				'description' => '',
+			);
+
+			$args = array(
+				'labels'            => $labels,
+				'hierarchical'      => true,
+				'public'            => false,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'show_in_nav_menus' => true,
+				'show_tagcloud'     => true,
+				'rewrite'           => $rewrite,
+				//'default_term'      => $default_term,
+			);
+
+			register_taxonomy( 'award', array( 'product' ), $args );
+		}
+		add_action( 'init', 'register_award_taxonomy', 0 );
+	}

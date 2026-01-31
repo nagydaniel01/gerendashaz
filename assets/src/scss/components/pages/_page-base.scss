@@ -1,0 +1,35 @@
+.page {
+  padding-top: 96px;
+  min-height: 100vh;
+
+  .page__header {
+    margin-bottom: 1.875rem;
+  }
+
+  .page__title {
+    margin-bottom: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .page__content {
+    .thank-you-details {
+      list-style: none;
+      padding: 0;
+    }
+  }
+
+  .page__footer {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .page {
+    .page__title {
+      font-size: 3.75rem;
+    }
+  }
+}

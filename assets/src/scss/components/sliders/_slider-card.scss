@@ -1,0 +1,44 @@
+.slider.slider--card {
+    .slick-list,
+    .slick-track,
+    .slick-slide,
+    .slick-slide > div {
+        display: flex;
+    }
+
+    .slick-list {
+        margin-left: calc($grid-gutter-width * -0.75);
+        margin-right: calc($grid-gutter-width * -0.75);
+    }
+
+    .slick-track {
+        flex: 1;
+    }
+
+    .slick-slide {
+        padding-top: calc($grid-gutter-width * 0.5);
+        padding-right: calc($grid-gutter-width * 0.75);
+        padding-bottom: calc($grid-gutter-width * 1);
+        padding-left: calc($grid-gutter-width * 0.75);
+    }
+
+    .slick-slide > div {
+        width: 100%;
+    }
+
+    .slider__list {
+        margin-top: 1rem;
+    }
+
+    .slider__figure {
+        display: block !important;
+    }
+
+    .slider__image {
+        display: block;
+        width: auto;
+        max-width: initial;
+        height: 250px;
+        border-radius: 15px;
+    }
+}

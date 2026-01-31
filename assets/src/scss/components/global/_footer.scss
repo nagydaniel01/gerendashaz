@@ -1,0 +1,123 @@
+.footer {
+  background-color: $secondary-light;
+  background: linear-gradient(to bottom, rgba($secondary, .5), rgba($secondary, .75)), url('../images/footer.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  color: $white;
+
+  &.footer--single-product {
+    margin-bottom: 5rem;
+  }
+
+  .footer__top {
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .footer__bottom {
+    padding-bottom: 1rem;
+  }
+
+  .footer__block {
+    margin-bottom: 1.25rem;
+  }
+
+  .footer__title {
+    padding: 0;
+    margin-bottom: 0.625rem;
+    font-size: 1.5rem;
+    background: transparent !important;
+    color: $white;
+
+    &::after {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="%23FFFFFF"><path d="M16 24.7c-.4 0-.7-.1-1-.4L.4 9.8c-.6-.6-.6-1.5 0-2.1.6-.6 1.5-.6 2.1 0L16 21.2 29.5 7.7c.6-.6 1.5-.6 2.1 0 .6.6.6 1.5 0 2.1L17 24.3c-.3.3-.6.4-1 .4z"/></svg>');
+    }
+  }
+
+  .footer__notice {
+    font-size: .75rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba($black, .25);
+    border-radius: $border-radius;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .footer__image {
+    width: auto;
+    height: 56px;
+    margin-top: 1rem;
+  }
+
+  .footer__opening-hours {
+    margin-top: 2rem;
+    
+    h4 {
+      color: $white;
+    }
+
+    .opening-hours {
+      th, td {
+        padding: 0;
+        color: $white;
+      }
+    }
+  }
+}
+
+.copyright {
+  margin-bottom: 0;
+  color: $white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  padding: 1.5rem 0;
+  border-top: 0.0625rem solid $white;
+  margin-top: 1.5rem;
+}
+
+.back-to-top {
+  position: fixed;
+  right: calc($grid-gutter-width * .5);
+  bottom: calc($grid-gutter-width * .5);
+  width: 2.75rem;
+  height: 2.75rem;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  display: grid;
+  place-items: center;
+  background-color: rgba($secondary, .5);
+  border-radius: $border-radius;
+  color: $white;
+
+  &.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@include media-breakpoint-up(xl) {
+  .footer {
+    .footer__top {
+      padding-top: 4rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .footer__block {
+      margin-bottom: 0;
+    }
+
+    .footer__title {
+      margin-bottom: 1.75rem;
+      font-size: 2rem;
+    }
+  }
+}

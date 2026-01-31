@@ -1,0 +1,123 @@
+table:not(.wc-block-cart-items),
+.table {
+  @extend .table;
+  @extend .table-bordered;
+  margin-bottom: 2rem;
+  font-size: .95rem;
+  background-color: transparent;
+  border-collapse: separate !important;
+  border-spacing: 0 .5rem;
+
+  tr {
+    border: none;
+  }
+
+  th, td {
+    vertical-align: middle;
+    text-align: left;
+    padding: .75rem 1rem;
+    background-color: $secondary-light;
+    border: none;
+
+    p {
+      margin: 0;
+    }
+
+    a:not(.button) {
+      color: var(--bs-primary);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .product-quantity {
+      font-weight: 600;
+      margin-left: .25rem;
+    }
+
+    &:first-child {
+      border-top-left-radius: 0.5rem !important;
+      border-bottom-left-radius: 0.5rem !important;
+    }
+
+    &:last-child {
+      border-top-right-radius: 0.5rem !important;
+      border-bottom-right-radius: 0.5rem !important;
+    }
+  }
+
+  th,
+  td:first-child {
+    font-weight: 600;
+  }
+
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+
+  thead {
+    @extend .table-light;
+
+    th {
+      font-weight: 600;
+      background-color: $secondary;
+      color: $white;
+
+      &:first-child {
+        border-radius: 15px 0 0 15px;
+      }
+
+      &:last-child {
+        text-align: right;
+        border-radius: 0 15px 15px 0;
+      }
+    }
+  }
+
+  tfoot {
+    th, td {
+      background-color: $gray-100;
+      font-size: .95rem;
+    }
+  }
+
+  &.wc-block-cart-items {
+    border: none !important;
+  }
+
+  &.opening-hours {
+    max-width: 20rem;
+
+    th, td {
+      background-color: transparent;
+    }
+  }
+}
+
+table {
+  &.woocommerce-table,
+  &.shop_table {
+    @extend .table;
+    @extend .table-striped;
+    @extend .table-bordered;
+    @extend .table-hover;
+
+    .button {
+      margin-left: .5rem;
+
+      &:first-child {
+        margin: 0;
+      }
+    }
+  }
+
+  &.woocommerce-MyAccount-orders {
+    .button {
+      @extend .btn-sm;
+    }
+  }
+}
