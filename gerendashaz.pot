@@ -280,7 +280,7 @@ msgid "Book now"
 msgstr ""
 
 #: inc/woocommerce-extras.php:17
-msgid "Borspirit Settings"
+msgid "Custom Settings"
 msgstr ""
 
 #: inc/woocommerce-extras.php:1544

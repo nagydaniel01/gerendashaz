@@ -3,18 +3,18 @@
         exit; // Exit if accessed directly
     }
 
-    if ( ! function_exists( 'borspirit_schedule_daily_orders_summary' ) ) {
+    if ( ! function_exists( 'gerendashaz_schedule_daily_orders_summary' ) ) {
         /**
          * Schedule daily email exactly at 17:00 UTC
          */
-        function borspirit_schedule_daily_orders_summary() {
+        function gerendashaz_schedule_daily_orders_summary() {
 
             if ( ! class_exists( 'ActionScheduler' ) ) {
                 return;
             }
 
             // Prevent duplicates
-            if ( as_next_scheduled_action( 'borspirit_send_daily_orders_summary', [], 'borspirit' ) ) {
+            if ( as_next_scheduled_action( 'gerendashaz_send_daily_orders_summary', [], 'gerendashaz' ) ) {
                 return;
             }
 
@@ -32,19 +32,19 @@
             as_schedule_recurring_action(
                 $run->getTimestamp(),        // ALWAYS 17:00:00
                 DAY_IN_SECONDS,              // 86400
-                'borspirit_send_daily_orders_summary',
+                'gerendashaz_send_daily_orders_summary',
                 [],
-                'borspirit'
+                'gerendashaz'
             );
         }
-        add_action( 'after_switch_theme', 'borspirit_schedule_daily_orders_summary' );
+        add_action( 'after_switch_theme', 'gerendashaz_schedule_daily_orders_summary' );
     }
 
-    if ( ! function_exists( 'borspirit_send_daily_orders_summary_email' ) ) {
+    if ( ! function_exists( 'gerendashaz_send_daily_orders_summary_email' ) ) {
         /**
          * Send HTML detailed daily WooCommerce orders summary.
          */
-        function borspirit_send_daily_orders_summary_email() {
+        function gerendashaz_send_daily_orders_summary_email() {
             if ( ! class_exists( 'WooCommerce' ) ) {
                 return;
             }
@@ -100,14 +100,14 @@
                 }
 
                 return "
-                <h4>" . esc_html__('Items', 'borspirit') . "</h4>
+                <h4>" . esc_html__('Items', 'gerendashaz') . "</h4>
                 <table cellpadding='6' cellspacing='0' border='1' width='100%' style='border-collapse:collapse; border-color:#ccc;'>
                     <tr style='background:#f7f7f7;'>
-                        <th align='left'>" . esc_html__('Product', 'borspirit') . "</th>
-                        <th align='left'>" . esc_html__('Price', 'borspirit') . "</th>
-                        <th align='left'>" . esc_html__('Qty', 'borspirit') . "</th>
-                        <th align='left'>" . esc_html__('Subtotal', 'borspirit') . "</th>
-                        <th align='left'>" . esc_html__('Tax', 'borspirit') . "</th>
+                        <th align='left'>" . esc_html__('Product', 'gerendashaz') . "</th>
+                        <th align='left'>" . esc_html__('Price', 'gerendashaz') . "</th>
+                        <th align='left'>" . esc_html__('Qty', 'gerendashaz') . "</th>
+                        <th align='left'>" . esc_html__('Subtotal', 'gerendashaz') . "</th>
+                        <th align='left'>" . esc_html__('Tax', 'gerendashaz') . "</th>
                     </tr>
                     {$rows}
                 </table>";
@@ -127,11 +127,11 @@
                 }
 
                 return "
-                <h4>" . esc_html__('Additional rates', 'borspirit') . "</h4>
+                <h4>" . esc_html__('Additional rates', 'gerendashaz') . "</h4>
                 <table cellpadding='6' cellspacing='0' border='1' width='100%' style='border-collapse:collapse; border-color:#ccc;'>
                     <tr style='background:#f7f7f7;'>
-                        <th align='left'>" . esc_html__('Fee name', 'borspirit') . "</th>
-                        <th align='left'>" . esc_html__('Amount', 'borspirit') . "</th>
+                        <th align='left'>" . esc_html__('Fee name', 'gerendashaz') . "</th>
+                        <th align='left'>" . esc_html__('Amount', 'gerendashaz') . "</th>
                     </tr>
                     {$rows}
                 </table>";
@@ -141,19 +141,19 @@
                 $total_fees = array_sum(array_map(fn($fee) => floatval($fee->get_total() + $fee->get_total_tax()), $order->get_fees()));
 
                 return "
-                <h4>" . esc_html__('Order totals', 'borspirit') . "</h4>
+                <h4>" . esc_html__('Order totals', 'gerendashaz') . "</h4>
                 <table cellpadding='6' cellspacing='0' border='1' width='100%' style='border-collapse:collapse; border-color:#ccc; margin-top:10px;'>
                     <tr>
                         <th align='left' style='background:#f7f7f7;'>&nbsp;</th>
-                        <th align='left' style='background:#f7f7f7;'>" . esc_html__('Amount', 'borspirit') . "</th>
+                        <th align='left' style='background:#f7f7f7;'>" . esc_html__('Amount', 'gerendashaz') . "</th>
                     </tr>
-                    <tr><td><strong>" . esc_html__('Subtotal', 'borspirit') . "</strong></td><td>" . wc_price($order->get_subtotal()) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Fees', 'borspirit') . "</strong></td><td>" . wc_price($total_fees) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Shipping', 'borspirit') . "</strong></td><td>" . wc_price($order->get_shipping_total()) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Tax', 'borspirit') . "</strong></td><td>" . wc_price($order->get_total_tax()) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Total', 'borspirit') . "</strong></td><td><strong>" . wc_price($order->get_total()) . "</strong></td></tr>
-                    <tr><td><strong>" . esc_html__('Payment method', 'borspirit') . "</strong></td><td>{$order->get_payment_method_title()}</td></tr>
-                    <tr><td><strong>" . esc_html__('Shipping method', 'borspirit') . "</strong></td><td>{$order->get_shipping_method()}</td></tr>
+                    <tr><td><strong>" . esc_html__('Subtotal', 'gerendashaz') . "</strong></td><td>" . wc_price($order->get_subtotal()) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Fees', 'gerendashaz') . "</strong></td><td>" . wc_price($total_fees) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Shipping', 'gerendashaz') . "</strong></td><td>" . wc_price($order->get_shipping_total()) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Tax', 'gerendashaz') . "</strong></td><td>" . wc_price($order->get_total_tax()) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Total', 'gerendashaz') . "</strong></td><td><strong>" . wc_price($order->get_total()) . "</strong></td></tr>
+                    <tr><td><strong>" . esc_html__('Payment method', 'gerendashaz') . "</strong></td><td>{$order->get_payment_method_title()}</td></tr>
+                    <tr><td><strong>" . esc_html__('Shipping method', 'gerendashaz') . "</strong></td><td>{$order->get_shipping_method()}</td></tr>
                 </table>";
             };
 
@@ -161,10 +161,10 @@
 
             // Start HTML
             $message = "<html><body style='font-family: Arial, sans-serif; font-size:14px; color:#333;'><div style='margin:20px;'>
-                <h2>" . sprintf( esc_html__('Daily %s Orders Report – %s', 'borspirit'), esc_html($site_name), $report_date ) . "</h2>";
+                <h2>" . sprintf( esc_html__('Daily %s Orders Report – %s', 'gerendashaz'), esc_html($site_name), $report_date ) . "</h2>";
 
             if (empty($orders)) {
-                $message .= "<p>" . sprintf( esc_html__('No %s orders were placed today.', 'borspirit'), esc_html($site_name) ) . "</p>";
+                $message .= "<p>" . sprintf( esc_html__('No %s orders were placed today.', 'gerendashaz'), esc_html($site_name) ) . "</p>";
             } else {
                 $daily_totals = [
                     'total_orders' => 0,
@@ -181,7 +181,7 @@
                     // Order header using h3 + wp_kses_post + sprintf
                     $order_header = wp_kses_post(
                         sprintf(
-                            esc_html__( 'Order #%1$s (%2$s)', 'borspirit' ),
+                            esc_html__( 'Order #%1$s (%2$s)', 'gerendashaz' ),
                             $order->get_order_number(),
                             wc_format_datetime( $order->get_date_created() )
                         )
@@ -190,20 +190,20 @@
                     $message .= "<h3 style='margin-top:0;'>{$order_header}</h3>";
 
                     $message .= "<p>";
-                    $message .= "<strong>" . esc_html__( 'Status', 'borspirit' ) . ":</strong> " . wc_get_order_status_name( $order->get_status() ) . "<br>";
-                    $message .= "<strong>" . esc_html__( 'Email', 'borspirit' ) . ":</strong> " . esc_html( $order->get_billing_email() ) . "<br>";
-                    $message .= "<strong>" . esc_html__( 'Phone', 'borspirit' ) . ":</strong> " . esc_html( $order->get_billing_phone() );
+                    $message .= "<strong>" . esc_html__( 'Status', 'gerendashaz' ) . ":</strong> " . wc_get_order_status_name( $order->get_status() ) . "<br>";
+                    $message .= "<strong>" . esc_html__( 'Email', 'gerendashaz' ) . ":</strong> " . esc_html( $order->get_billing_email() ) . "<br>";
+                    $message .= "<strong>" . esc_html__( 'Phone', 'gerendashaz' ) . ":</strong> " . esc_html( $order->get_billing_phone() );
                     $message .= "</p>";
 
                     // Billing address
                     if ( $order->get_formatted_billing_address() ) {
-                        $message .= "<h4>" . esc_html__( 'Billing address', 'borspirit' ) . "</h4>";
+                        $message .= "<h4>" . esc_html__( 'Billing address', 'gerendashaz' ) . "</h4>";
                         $message .= "<p>" . wp_kses_post( $order->get_formatted_billing_address() ) . "</p>";
                     }
 
                     // Shipping address (if exists)
                     if ( $order->get_formatted_shipping_address() ) {
-                        $message .= "<h4>" . esc_html__( 'Shipping address', 'borspirit' ) . "</h4>";
+                        $message .= "<h4>" . esc_html__( 'Shipping address', 'gerendashaz' ) . "</h4>";
                         $message .= "<p>" . wp_kses_post( $order->get_formatted_shipping_address() ) . "</p>";
                     }
 
@@ -212,7 +212,7 @@
                     $message .= $generate_order_totals_table($order);
 
                     if ($order->get_customer_note()) {
-                        $message .= "<h4>" . esc_html__('Customer note', 'borspirit') . "</h4><p>" . nl2br(esc_html($order->get_customer_note())) . "</p>";
+                        $message .= "<h4>" . esc_html__('Customer note', 'gerendashaz') . "</h4><p>" . nl2br(esc_html($order->get_customer_note())) . "</p>";
                     }
 
                     $message .= "</div>";
@@ -226,14 +226,14 @@
                 }
 
                 // Daily totals table
-                $message .= "<h3>" . esc_html__('Daily totals summary', 'borspirit') . "</h3>
+                $message .= "<h3>" . esc_html__('Daily totals summary', 'gerendashaz') . "</h3>
                 <table cellpadding='6' cellspacing='0' border='1' width='100%' style='border-collapse:collapse; border-color:#ccc; margin-bottom:20px;'>
-                    <tr style='background:#f7f7f7;'><th align='left'>" . esc_html__('Metric', 'borspirit') . "</th><th align='left'>" . esc_html__('Amount', 'borspirit') . "</th></tr>
-                    <tr><td><strong>" . esc_html__('Total orders', 'borspirit') . "</strong></td><td>{$daily_totals['total_orders']}</td></tr>
-                    <tr><td><strong>" . esc_html__('Total revenue (excl. tax)', 'borspirit') . "</strong></td><td>" . wc_price($daily_totals['revenue_excl_tax']) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Total revenue (incl. tax)', 'borspirit') . "</strong></td><td>" . wc_price($daily_totals['revenue_incl_tax']) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Total tax collected', 'borspirit') . "</strong></td><td>" . wc_price($daily_totals['tax_total']) . "</td></tr>
-                    <tr><td><strong>" . esc_html__('Total shipping collected', 'borspirit') . "</strong></td><td>" . wc_price($daily_totals['shipping_total']) . "</td></tr>
+                    <tr style='background:#f7f7f7;'><th align='left'>" . esc_html__('Metric', 'gerendashaz') . "</th><th align='left'>" . esc_html__('Amount', 'gerendashaz') . "</th></tr>
+                    <tr><td><strong>" . esc_html__('Total orders', 'gerendashaz') . "</strong></td><td>{$daily_totals['total_orders']}</td></tr>
+                    <tr><td><strong>" . esc_html__('Total revenue (excl. tax)', 'gerendashaz') . "</strong></td><td>" . wc_price($daily_totals['revenue_excl_tax']) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Total revenue (incl. tax)', 'gerendashaz') . "</strong></td><td>" . wc_price($daily_totals['revenue_incl_tax']) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Total tax collected', 'gerendashaz') . "</strong></td><td>" . wc_price($daily_totals['tax_total']) . "</td></tr>
+                    <tr><td><strong>" . esc_html__('Total shipping collected', 'gerendashaz') . "</strong></td><td>" . wc_price($daily_totals['shipping_total']) . "</td></tr>
                 </table>";
             }
 
@@ -243,38 +243,38 @@
             wp_mail(
                 [
                     get_field( 'site_email', 'option' ),
-                    'hello@borspirit.hu'
+                    'hello@gerendashaz.hu'
                 ],
-                sprintf( esc_html__('Daily %s Orders Report – %s', 'borspirit'), esc_html($site_name), $report_date ),
+                sprintf( esc_html__('Daily %s Orders Report – %s', 'gerendashaz'), esc_html($site_name), $report_date ),
                 $message,
                 ['Content-Type: text/html; charset=UTF-8']
             );
         }
-        add_action('borspirit_send_daily_orders_summary', 'borspirit_send_daily_orders_summary_email');
+        add_action('gerendashaz_send_daily_orders_summary', 'gerendashaz_send_daily_orders_summary_email');
     }
 
-    if ( ! function_exists( 'borspirit_render_daily_orders_widget' ) ) {
+    if ( ! function_exists( 'gerendashaz_render_daily_orders_widget' ) ) {
         /**
          * Registers the "Daily Orders Summary" dashboard widget in WordPress.
          *
          * This widget displays daily WooCommerce order totals, product quantities,
          * and provides a button to send the daily report email manually.
          */
-        function borspirit_register_daily_orders_widget() {
+        function gerendashaz_register_daily_orders_widget() {
             if ( ! class_exists( 'WooCommerce' ) ) {
                 return;
             }
 
             wp_add_dashboard_widget(
-                'borspirit_daily_orders_widget',
-                __( 'Daily Orders Summary', 'borspirit' ),
-                'borspirit_render_daily_orders_widget'
+                'gerendashaz_daily_orders_widget',
+                __( 'Daily Orders Summary', 'gerendashaz' ),
+                'gerendashaz_render_daily_orders_widget'
             );
         }
-        add_action( 'wp_dashboard_setup', 'borspirit_register_daily_orders_widget' );
+        add_action( 'wp_dashboard_setup', 'gerendashaz_register_daily_orders_widget' );
     }
 
-    if ( ! function_exists( 'borspirit_render_daily_orders_widget' ) ) {
+    if ( ! function_exists( 'gerendashaz_render_daily_orders_widget' ) ) {
         /**
          * Renders the content of the "Daily Orders Summary" dashboard widget.
          *
@@ -292,26 +292,26 @@
          * - Nonce verification is used for the manual send button.
          * - Checks if required functions exist before running.
          */
-        function borspirit_render_daily_orders_widget() {
+        function gerendashaz_render_daily_orders_widget() {
             if ( ! current_user_can( 'manage_woocommerce' ) ) {
-                echo '<p>' . esc_html__( 'You do not have permission to view this data.', 'borspirit' ) . '</p>';
+                echo '<p>' . esc_html__( 'You do not have permission to view this data.', 'gerendashaz' ) . '</p>';
                 return;
             }
 
             // Manual send (only if function exists)
             if (
-                isset( $_POST['borspirit_send_daily_report'] ) &&
-                function_exists( 'borspirit_send_daily_orders_summary_email' ) &&
-                check_admin_referer( 'borspirit_send_daily_report_action' )
+                isset( $_POST['gerendashaz_send_daily_report'] ) &&
+                function_exists( 'gerendashaz_send_daily_orders_summary_email' ) &&
+                check_admin_referer( 'gerendashaz_send_daily_report_action' )
             ) {
-                borspirit_send_daily_orders_summary_email();
+                gerendashaz_send_daily_orders_summary_email();
                 echo '<div class="notice notice-success inline"><p>' .
-                    esc_html__( 'Daily report email sent.', 'borspirit' ) .
+                    esc_html__( 'Daily report email sent.', 'gerendashaz' ) .
                     '</p></div>';
             }
 
             if ( ! function_exists( 'wc_get_orders' ) ) {
-                echo '<p>' . esc_html__( 'WooCommerce is not available.', 'borspirit' ) . '</p>';
+                echo '<p>' . esc_html__( 'WooCommerce is not available.', 'gerendashaz' ) . '</p>';
                 return;
             }
 
@@ -360,25 +360,25 @@
             // Totals table
             // ======================
             echo '<table class="widefat striped"><tbody>';
-            echo '<tr><td><strong>' . esc_html__( 'Total orders', 'borspirit' ) . '</strong></td><td>' . esc_html( $totals['orders'] ) . '</td></tr>';
-            echo '<tr><td><strong>' . esc_html__( 'Total revenue', 'borspirit' ) . '</strong></td><td>' . wc_price( $totals['revenue'] ) . '</td></tr>';
-            echo '<tr><td><strong>' . esc_html__( 'Total tax', 'borspirit' ) . '</strong></td><td>' . wc_price( $totals['tax'] ) . '</td></tr>';
-            echo '<tr><td><strong>' . esc_html__( 'Total shipping', 'borspirit' ) . '</strong></td><td>' . wc_price( $totals['shipping'] ) . '</td></tr>';
+            echo '<tr><td><strong>' . esc_html__( 'Total orders', 'gerendashaz' ) . '</strong></td><td>' . esc_html( $totals['orders'] ) . '</td></tr>';
+            echo '<tr><td><strong>' . esc_html__( 'Total revenue', 'gerendashaz' ) . '</strong></td><td>' . wc_price( $totals['revenue'] ) . '</td></tr>';
+            echo '<tr><td><strong>' . esc_html__( 'Total tax', 'gerendashaz' ) . '</strong></td><td>' . wc_price( $totals['tax'] ) . '</td></tr>';
+            echo '<tr><td><strong>' . esc_html__( 'Total shipping', 'gerendashaz' ) . '</strong></td><td>' . wc_price( $totals['shipping'] ) . '</td></tr>';
             echo '</tbody></table>';
 
             // ======================
             // Products table
             // ======================
-            echo '<h4 style="margin-top:16px">' . esc_html__( 'Items sold', 'borspirit' ) . '</h4>';
+            echo '<h4 style="margin-top:16px">' . esc_html__( 'Items sold', 'gerendashaz' ) . '</h4>';
 
             if ( empty( $products ) ) {
 
-                echo '<p style="color:#666">' . esc_html__( 'No items sold in this period.', 'borspirit' ) . '</p>';
+                echo '<p style="color:#666">' . esc_html__( 'No items sold in this period.', 'gerendashaz' ) . '</p>';
 
             } else {
 
                 echo '<table class="widefat striped"><tbody>';
-                echo '<tr><th>' . esc_html__( 'Product', 'borspirit' ) . '</th><th>' . esc_html__( 'Quantity', 'borspirit' ) . '</th></tr>';
+                echo '<tr><th>' . esc_html__( 'Product', 'gerendashaz' ) . '</th><th>' . esc_html__( 'Quantity', 'gerendashaz' ) . '</th></tr>';
 
                 foreach ( $products as $product_name => $qty ) {
                     echo '<tr>';
@@ -393,7 +393,7 @@
             // Footer
             echo '<p style="margin-top:12px;font-size:12px;color:#666">';
             echo sprintf(
-                esc_html__( 'Reporting window: %1$s → %2$s (%3$s)', 'borspirit' ),
+                esc_html__( 'Reporting window: %1$s → %2$s (%3$s)', 'gerendashaz' ),
                 esc_html( $start_dt->format( 'Y-m-d H:i' ) ),
                 esc_html( $end_dt->format( 'Y-m-d H:i' ) ),
                 esc_html( wp_timezone_string() )
@@ -401,13 +401,13 @@
             echo '</p>';
 
             // Button
-            if ( function_exists( 'borspirit_send_daily_orders_summary_email' ) ) {
+            if ( function_exists( 'gerendashaz_send_daily_orders_summary_email' ) ) {
                 echo '<form method="post" style="margin-top:12px">';
-                wp_nonce_field( 'borspirit_send_daily_report_action' );
+                wp_nonce_field( 'gerendashaz_send_daily_report_action' );
                 submit_button(
-                    __( 'Send daily report now', 'borspirit' ),
+                    __( 'Send daily report now', 'gerendashaz' ),
                     'primary',
-                    'borspirit_send_daily_report',
+                    'gerendashaz_send_daily_report',
                     false
                 );
                 echo '</form>';

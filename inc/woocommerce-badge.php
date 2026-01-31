@@ -170,7 +170,7 @@
                 }
                 */
 
-                echo '<span class="badge badge--award">' . esc_html__( 'Award Winner', 'borspirit' ) . '</span>';
+                echo '<span class="badge badge--award">' . esc_html__( 'Award Winner', 'gerendashaz' ) . '</span>';
             }
         }
     }
@@ -189,7 +189,7 @@
             }
 
             if ( $product->get_total_sales() >= $sales_threshold ) {
-                echo '<span class="badge badge--bestseller">' . esc_html__( 'Best Seller', 'borspirit' ) . '</span>';
+                echo '<span class="badge badge--bestseller">' . esc_html__( 'Best Seller', 'gerendashaz' ) . '</span>';
             }
         }
     }
@@ -208,7 +208,7 @@
             }
 
             if ( $product->managing_stock() && $product->get_stock_quantity() <= $stock_limit ) {
-                echo '<span class="badge badge--limited">' . esc_html__( 'Limited Stock', 'borspirit' ) . '</span>';
+                echo '<span class="badge badge--limited">' . esc_html__( 'Limited Stock', 'gerendashaz' ) . '</span>';
             }
         }
     }
@@ -231,7 +231,7 @@
             $datediff  = strtotime( $now ) - strtotime( $post_date );
 
             if ( $datediff / DAY_IN_SECONDS <= $days_new ) {
-                echo '<span class="badge badge--new">' . esc_html__( 'New Arrival', 'borspirit' ) . '</span>';
+                echo '<span class="badge badge--new">' . esc_html__( 'New Arrival', 'gerendashaz' ) . '</span>';
             }
         }
     }
@@ -258,7 +258,7 @@
 
                 // If any of the terms matches the current year
                 if ( in_array( $current_year, $terms, true ) ) {
-                    echo '<span class="badge badge--new-vintage">' . esc_html__( 'New Vintage', 'borspirit' ) . '</span>';
+                    echo '<span class="badge badge--new-vintage">' . esc_html__( 'New Vintage', 'gerendashaz' ) . '</span>';
                 }
             }
         }
@@ -354,7 +354,7 @@
             }
 
             if ( 'yes' === get_post_meta( $product->get_id(), 'organic', true ) ) {
-                echo '<span class="badge badge--organic">' . esc_html__( 'Organic', 'borspirit' ) . '</span>';
+                echo '<span class="badge badge--organic">' . esc_html__( 'Organic', 'gerendashaz' ) . '</span>';
             }
         }
         */
@@ -379,14 +379,14 @@
 
             // Define all badge flash functions you want available
             $badge_functions = array(
-                'wc_wine_store_custom_sale_flash'   => __( 'Sale Badge', 'borspirit' ),
-                'wc_wine_store_discount_flash'      => __( 'Discount Badge', 'borspirit' ),
-                'wc_wine_store_award_flash'         => __( 'Award Winner Badge', 'borspirit' ),
-                'wc_wine_store_bestseller_flash'    => __( 'Best Seller Badge', 'borspirit' ),
-                'wc_wine_store_limited_stock_flash' => __( 'Limited Stock Badge', 'borspirit' ),
-                'wc_wine_store_new_flash'           => __( 'New Arrival Badge', 'borspirit' ),
-                'wc_wine_store_new_vintage_flash'   => __( 'New Vintage Badge', 'borspirit' ),
-                'wc_wine_store_category_flash'      => __( 'Wine of the month Badge', 'borspirit' ),
+                'wc_wine_store_custom_sale_flash'   => __( 'Sale Badge', 'gerendashaz' ),
+                'wc_wine_store_discount_flash'      => __( 'Discount Badge', 'gerendashaz' ),
+                'wc_wine_store_award_flash'         => __( 'Award Winner Badge', 'gerendashaz' ),
+                'wc_wine_store_bestseller_flash'    => __( 'Best Seller Badge', 'gerendashaz' ),
+                'wc_wine_store_limited_stock_flash' => __( 'Limited Stock Badge', 'gerendashaz' ),
+                'wc_wine_store_new_flash'           => __( 'New Arrival Badge', 'gerendashaz' ),
+                'wc_wine_store_new_vintage_flash'   => __( 'New Vintage Badge', 'gerendashaz' ),
+                'wc_wine_store_category_flash'      => __( 'Wine of the month Badge', 'gerendashaz' ),
             );
 
             // Loop through and only add existing functions (safety check)

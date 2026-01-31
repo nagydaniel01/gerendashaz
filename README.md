@@ -1,4 +1,4 @@
-<h1>🧩 BorSpirit x NagyDanielEV WordPress Theme</h1>
+<h1>🧩 Gerendásház x NagyDanielEV WordPress Theme</h1>
 <p><strong>Verzió:</strong> v1.0<br>
 <strong>Készítette:</strong> Nagy Dániel<br>
 <strong>Dátum:</strong> 2025. október 10.</p>
@@ -8,7 +8,7 @@
 <section>
   <h2>🎯 Cél és Megindoklás</h2>
   <p>
-    A BorSpirit x NagyDanielEV WordPress Theme célja, hogy <strong>egységes, moduláris és jól dokumentált WordPress sablon</strong> alapot biztosítson a projekt fejlesztői számára. Az egységes fejlesztési környezet elősegíti a <strong>hatékony csapatmunkát</strong>, a <strong>minőségbiztosítást</strong> és a <strong>könnyű karbantarthatóságot</strong>.
+    A Gerendásház x NagyDanielEV WordPress Theme célja, hogy <strong>egységes, moduláris és jól dokumentált WordPress sablon</strong> alapot biztosítson a projekt fejlesztői számára. Az egységes fejlesztési környezet elősegíti a <strong>hatékony csapatmunkát</strong>, a <strong>minőségbiztosítást</strong> és a <strong>könnyű karbantarthatóságot</strong>.
   </p>
 
   <h3>Előnyök</h3>
@@ -487,7 +487,7 @@
 
 <section>
   <h2>✅ Összegzés</h2>
-  <p>A <strong>BorSpirit x NagyDanielEV WordPress Theme</strong> egy modern, egységes és skálázható fejlesztői alap, amely:</p>
+  <p>A <strong>Gerendásház x NagyDanielEV WordPress Theme</strong> egy modern, egységes és skálázható fejlesztői alap, amely:</p>
   <ul>
     <li>gyorsítja a fejlesztést,</li>
     <li>csökkenti a hibákat,</li>

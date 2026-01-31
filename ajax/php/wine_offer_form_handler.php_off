@@ -25,7 +25,7 @@ if ( ! function_exists('prq_quiz_handle_recommend') ) {
             }
 
             // Compute recommendation
-            $quiz = new BorSpirit_Wine_Quiz(); // Make sure this class exists
+            $quiz = new Gerendásház_Wine_Quiz(); // Make sure this class exists
             $rule = $quiz->compute_recommendation($answers);
 
             // ---------- Product recommendation ----------

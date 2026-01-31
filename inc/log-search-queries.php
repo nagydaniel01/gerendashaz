@@ -209,7 +209,7 @@
             // Filters & buttons
             echo '<form id="posts-filter" method="GET">';
             echo '<div class="tablenav top">';
-            echo '<input type="hidden" name="page" value="borspirit">';
+            echo '<input type="hidden" name="page" value="gerendashaz">';
             echo '<div class="alignleft actions">';
             echo '<input type="text" name="s" placeholder="' . esc_attr__( 'Keyword', 'gerendashaz' ) . '" value="' . esc_attr( $_GET['s'] ?? '' ) . '"> ';
             echo esc_html__( 'From:', 'gerendashaz' ) . ' <input type="date" name="date_from" value="' . esc_attr( $_GET['date_from'] ?? '' ) . '"> ';
@@ -326,12 +326,12 @@
             );
 
             if ( empty( $results ) ) {
-                wp_redirect( add_query_arg( 'search_logs_export', 'empty', admin_url( 'tools.php?page=borspirit' ) ) );
+                wp_redirect( add_query_arg( 'search_logs_export', 'empty', admin_url( 'tools.php?page=gerendashaz' ) ) );
                 exit;
             }
 
             header( 'Content-Type: text/csv; charset=utf-8' );
-            header( 'Content-Disposition: attachment; filename=borspirit-' . date( 'Y-m-d-H-i-s' ) . '.csv' );
+            header( 'Content-Disposition: attachment; filename=gerendashaz-' . date( 'Y-m-d-H-i-s' ) . '.csv' );
             header( 'Pragma: no-cache' );
             header( 'Expires: 0' );
 

@@ -24,14 +24,14 @@
                 // Ensure the request method is POST
                 if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
                     wp_send_json_error([
-                        'message' => __('Invalid request method.', 'borspirit')
+                        'message' => __('Invalid request method.', 'gerendashaz')
                     ], 405);
                 }
 
                 // Check if form data is present
                 if ( empty($_POST['form_data']) ) {
                     wp_send_json_error([
-                        'message' => __('No form data received.', 'borspirit')
+                        'message' => __('No form data received.', 'gerendashaz')
                     ], 400);
                 }
 
@@ -45,7 +45,7 @@
                 $recaptcha_token = isset($form['recaptcha_token']) ? sanitize_text_field($form['recaptcha_token']) : '';
 
                 if (empty($recaptcha_token)) {
-                    wp_send_json_error(['message' => __('reCAPTCHA verification failed (missing token).', 'borspirit')], 400);
+                    wp_send_json_error(['message' => __('reCAPTCHA verification failed (missing token).', 'gerendashaz')], 400);
                 }
 
                 // Send verification request to Google
@@ -58,7 +58,7 @@
                 ]);
 
                 if (is_wp_error($response)) {
-                    wp_send_json_error(['message' => __('Unable to verify reCAPTCHA (request failed).', 'borspirit')], 400);
+                    wp_send_json_error(['message' => __('Unable to verify reCAPTCHA (request failed).', 'gerendashaz')], 400);
                 }
 
                 // Decode Google API response
@@ -70,14 +70,14 @@
                 // If reCAPTCHA fails OR score too low → possible bot
                 if ( empty($recaptcha['success']) || ($recaptcha['score'] ?? 0) < 0.3 ) {
                     wp_send_json_error([
-                        'message' => __('Suspicious activity detected. reCAPTCHA failed.', 'borspirit')
+                        'message' => __('Suspicious activity detected. reCAPTCHA failed.', 'gerendashaz')
                     ], 403);
                 }
 
                 // Nonce verification for security
                 if ( ! isset($form['contact_form_nonce']) || ! wp_verify_nonce($form['contact_form_nonce'], 'contact_form_action') ) {
                     wp_send_json_error([
-                        'message' => __('Invalid security token.', 'borspirit')
+                        'message' => __('Invalid security token.', 'gerendashaz')
                     ], 403);
                 }
 
@@ -97,21 +97,21 @@
                 // Validate required fields
                 if ( empty($name) || empty($email) || empty($subject) || empty($message) ) {
                     wp_send_json_error([
-                        'message' => __('All required fields must be filled out.', 'borspirit')
+                        'message' => __('All required fields must be filled out.', 'gerendashaz')
                     ], 422);
                 }
 
                 // Validate email format
                 if ( ! is_email($email) ) {
                     wp_send_json_error([
-                        'message' => __('Invalid email format.', 'borspirit')
+                        'message' => __('Invalid email format.', 'gerendashaz')
                     ], 422);
                 }
 
                 // Validate privacy policy consent
                 if ( empty($privacy) || $privacy !== 'on' ) {
                     wp_send_json_error([
-                        'message' => __('You must agree to the privacy policy.', 'borspirit')
+                        'message' => __('You must agree to the privacy policy.', 'gerendashaz')
                     ], 422);
                 }
 
@@ -119,7 +119,7 @@
                 $admin_email = get_option('admin_email');
                 if ( ! $admin_email || ! is_email($admin_email) ) {
                     wp_send_json_error([
-                        'message' => __('Admin email is not configured properly.', 'borspirit')
+                        'message' => __('Admin email is not configured properly.', 'gerendashaz')
                     ], 500);
                 }
 
@@ -132,7 +132,7 @@
 
                 // Email subject formatted with site name
                 $mail_subject = sprintf(
-                    __('[%1$s] New message: %2$s', 'borspirit'),
+                    __('[%1$s] New message: %2$s', 'gerendashaz'),
                     get_bloginfo('name'),
                     $subject
                 );
@@ -168,7 +168,7 @@
                 $sent = wp_mail(
                     [
                         get_field( 'site_email', 'option' ), 
-                        'hello@borspirit.hu'
+                        'hello@gerendashaz.hu'
                     ], 
                     $mail_subject, 
                     $mail_message, 
@@ -177,7 +177,7 @@
 
                 if ( ! $sent ) {
                     wp_send_json_error([
-                        'message' => __('Message could not be sent. Please try again later.', 'borspirit')
+                        'message' => __('Message could not be sent. Please try again later.', 'gerendashaz')
                     ], 500);
                 }
 
@@ -195,7 +195,7 @@
                 
                 // Success response
                 wp_send_json_success([
-                    'message'      => __('Your message has been sent successfully!', 'borspirit'),
+                    'message'      => __('Your message has been sent successfully!', 'gerendashaz'),
                     'redirect_url' => esc_url( trailingslashit( get_the_permalink( THANK_YOU_PAGE_ID ) ) ),
                     'message_id'   => $message_id
                 ], 200);
@@ -203,7 +203,7 @@
             } catch ( Exception $e ) {
                 // Catch any unexpected errors
                 wp_send_json_error([
-                    'message' => sprintf(__('Unexpected error: %s', 'borspirit'), $e->getMessage())
+                    'message' => sprintf(__('Unexpected error: %s', 'gerendashaz'), $e->getMessage())
                 ], 500);
             }
         }

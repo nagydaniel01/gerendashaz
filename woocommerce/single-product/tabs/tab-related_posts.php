@@ -49,6 +49,6 @@ $related_posts = array_filter( $related_posts ?? [], function ($post) {
             <div class="slider__controls"></div>
         </div>
     <?php else : ?>
-        <?php echo wpautop( __( 'No related posts found.', 'borspirit' ) ); ?>
+        <?php echo wpautop( __( 'No related posts found.', 'gerendashaz' ) ); ?>
     <?php endif; ?>
 </div>

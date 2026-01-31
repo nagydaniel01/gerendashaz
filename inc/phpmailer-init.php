@@ -35,13 +35,13 @@
             $phpmailer->isSMTP();
 
             // Replace these values with your cPanel email account info
-            $phpmailer->Host       = 'mail.borspirit.hu'; // Usually mail.yourdomain.com
+            $phpmailer->Host       = 'mail.gerendashaz.hu'; // Usually mail.yourdomain.com
             $phpmailer->SMTPAuth   = true;
             $phpmailer->Port       = 465;                   // Use 465 for SSL, 587 for TLS
             $phpmailer->SMTPSecure = 'ssl';                 // 'ssl' or 'tls'
-            $phpmailer->Username   = 'hello@borspirit.hu';  // Your cPanel email address
+            $phpmailer->Username   = 'hello@gerendashaz.hu';  // Your cPanel email address
             $phpmailer->Password   = 'Timike1986@.';        // Your email password
-            $phpmailer->From       = 'hello@borspirit.hu';  // Optional: set From address
+            $phpmailer->From       = 'hello@gerendashaz.hu';  // Optional: set From address
             $phpmailer->FromName   = 'gerendashaz';           // Optional: set From name
         }
         //add_action( 'phpmailer_init', 'cpanel_mail' );

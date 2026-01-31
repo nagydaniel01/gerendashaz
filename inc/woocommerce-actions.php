@@ -368,7 +368,7 @@
                     <svg class="icon icon-bookmark-empty">
                         <use xlink:href="#icon-bookmark-empty"></use>
                     </svg>
-                    <span class="visually-hidden"><?php echo esc_html__( 'Add to bookmarks', 'borspirit' ); ?></span>
+                    <span class="visually-hidden"><?php echo esc_html__( 'Add to bookmarks', 'gerendashaz' ); ?></span>
                 </a>
                 <?php
             } else {
@@ -377,7 +377,7 @@
                 $bookmark_ids    = get_field( 'user_bookmarks', 'user_' . $current_user_id ) ?: [];
                 $is_bookmarked   = in_array( $post_id, $bookmark_ids, true );
                 $bookmark_icon   = $is_bookmarked ? 'bookmark' : 'bookmark-empty';
-                $bookmark_text   = $is_bookmarked ? __( 'Remove from bookmarks', 'borspirit' ) : __( 'Add to bookmarks', 'borspirit' );
+                $bookmark_text   = $is_bookmarked ? __( 'Remove from bookmarks', 'gerendashaz' ) : __( 'Add to bookmarks', 'gerendashaz' );
                 ?>
                 <a id="btn-bookmark" class="woocommerce-loop-product__bookmark" href="#" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-bookmarked="<?php echo esc_attr( $is_bookmarked ? 'true' : 'false' ); ?>">
                     <svg class="icon icon-<?php echo esc_attr( $bookmark_icon ); ?>">
@@ -797,18 +797,18 @@
                 $page_id  = get_the_ID();
 
                 if ( empty($page_id) || !is_numeric($page_id) ) {
-                    throw new Exception( __('The page ID is missing or invalid.', 'borspirit') );
+                    throw new Exception( __('The page ID is missing or invalid.', 'gerendashaz') );
                 }
 
                 // Define the base directory for template section files
                 $template_dir = trailingslashit(get_template_directory()) . 'template-parts/sections/';
                 if ( ! is_dir($template_dir) ) {
-                    throw new Exception( sprintf( __('The required template directory does not exist: %s.', 'borspirit'), $template_dir ) );
+                    throw new Exception( sprintf( __('The required template directory does not exist: %s.', 'gerendashaz'), $template_dir ) );
                 }
 
                 // Check for ACF
                 if ( ! function_exists('get_field') ) {
-                    throw new Exception( __('The Advanced Custom Fields plugin is not activated. Please install or activate ACF to use sections.', 'borspirit') );
+                    throw new Exception( __('The Advanced Custom Fields plugin is not activated. Please install or activate ACF to use sections.', 'gerendashaz') );
                 }
 
                 // First try product-specific sections
@@ -833,7 +833,7 @@
                         if ( ! is_array($section) || empty($section['acf_fc_layout']) ) {
                             printf(
                                 '<div class="alert alert-warning" role="alert">%s</div>',
-                                esc_html( sprintf( __('Section #%d is incorrectly formatted and cannot be displayed.', 'borspirit'), $section_num ) )
+                                esc_html( sprintf( __('Section #%d is incorrectly formatted and cannot be displayed.', 'gerendashaz'), $section_num ) )
                             );
                             continue;
                         }
@@ -847,7 +847,7 @@
                             printf(
                                 '<div class="alert alert-danger" role="alert">%s</div>',
                                 sprintf(
-                                    __('The template for <code>%s</code> section is missing. Please create the file: <code>%s</code>', 'borspirit'),
+                                    __('The template for <code>%s</code> section is missing. Please create the file: <code>%s</code>', 'gerendashaz'),
                                     esc_html( $section_name ),
                                     esc_html( $section_file )
                                 )
@@ -974,8 +974,8 @@
             if ( isset( $_GET['wc_send_order_summary'] ) ) {
                 wc_send_table_based_daily_order_summary_email();
                 wp_die(
-                    esc_html__( 'WooCommerce summary e-mail sent (check your inbox).', 'borspirit' ),
-                    esc_html__( 'E-mail sent', 'borspirit' ),
+                    esc_html__( 'WooCommerce summary e-mail sent (check your inbox).', 'gerendashaz' ),
+                    esc_html__( 'E-mail sent', 'gerendashaz' ),
                     array( 'response' => 200 )
                 );
             }

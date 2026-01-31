@@ -34,7 +34,7 @@ if ( in_array( 'units_sold_message', $selected_icons, true ) && isset( $product 
                 '%s person has already tried it – get yours now!',
                 '%s people have already tried it – get yours now!',
                 $units_sold,
-                'borspirit'
+                'gerendashaz'
             ),
             number_format_i18n( $units_sold )
         );
@@ -83,7 +83,7 @@ if ( in_array( 'free_shipping_limit_message', $selected_icons, true ) && ! is_ad
 
                 if ( is_numeric( $min_amount ) && $min_amount > 0 ) {
                     $free_shipping_limit_message = sprintf(
-                        __( 'Free shipping on orders over %1$s', 'borspirit' ),
+                        __( 'Free shipping on orders over %1$s', 'gerendashaz' ),
                         wc_price( $min_amount )
                     );
                     break; // Stop after the first valid free shipping method
@@ -160,7 +160,7 @@ if ( in_array('estimated_delivery_message', $selected_icons) ) {
     $estimated_date = $formatter->format($estimated_timestamp);
 
     $estimated_delivery_message = sprintf(
-        __( 'Free in-store pickup as early as %1$s', 'borspirit' ),
+        __( 'Free in-store pickup as early as %1$s', 'gerendashaz' ),
         $estimated_date
     );
 }
@@ -207,6 +207,6 @@ if ( in_array('estimated_delivery_message', $selected_icons) ) {
 
         </div>
     <?php else : ?>
-        <?php echo wpautop( __( 'No icon items found.', 'borspirit' ) ); ?>
+        <?php echo wpautop( __( 'No icon items found.', 'gerendashaz' ) ); ?>
     <?php endif; ?>
 </div>

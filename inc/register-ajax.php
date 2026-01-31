@@ -212,7 +212,7 @@
                     'msg_network_error' => __( 'A network error occurred.', 'gerendashaz' )
                 ) );
             } else {
-                error_log( 'BorSpirit quiz script file does not exist: ' . $script_path );
+                error_log( 'Gerendásház quiz script file does not exist: ' . $script_path );
             }
         }
         //add_action( 'wp_enqueue_scripts', 'enqueue_prq_quiz_ajax_scripts' );

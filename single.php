@@ -120,14 +120,14 @@
                                     // Show last modified date if different
                                     printf(
                                         /* translators: %s: Post modified date */
-                                        __('Updated on %s', 'borspirit'),
+                                        __('Updated on %s', 'gerendashaz'),
                                         esc_html( $modified )
                                     );
                                 } else {
                                     // Otherwise show published date
                                     printf(
                                         /* translators: %s: Post date */
-                                        __('Published on %s', 'borspirit'),
+                                        __('Published on %s', 'gerendashaz'),
                                         esc_html( $published )
                                     );
                                 }
@@ -143,7 +143,7 @@
                                             '%s minute reading',   // singular
                                             '%s minutes reading',  // plural
                                             $estimated_reading_time,
-                                            'borspirit'
+                                            'gerendashaz'
                                         ),
                                         esc_html( $estimated_reading_time )
                                     );
@@ -156,14 +156,14 @@
                                 <svg class="icon icon-bookmark-empty">
                                     <use xlink:href="#icon-bookmark-empty"></use>
                                 </svg>
-                                <span><?php echo esc_html__('Add to bookmarks', 'borspirit'); ?></span>
+                                <span><?php echo esc_html__('Add to bookmarks', 'gerendashaz'); ?></span>
                             </a>
                         <?php else : ?>
                             <?php
                                 $bookmark_ids  = get_field('user_bookmarks', 'user_'.$current_user_id) ?: [];
                                 $is_bookmarked = in_array( get_the_ID(), $bookmark_ids, true );
                                 $bookmark_icon = $is_bookmarked ? 'bookmark' : 'bookmark-empty';
-                                $bookmark_text = $is_bookmarked ? __('Remove form bookmarks', 'borspirit') : __('Add to bookmarks', 'borspirit');
+                                $bookmark_text = $is_bookmarked ? __('Remove form bookmarks', 'gerendashaz') : __('Add to bookmarks', 'gerendashaz');
                             ?>
                             <a id="btn-bookmark" class="section__bookmark" href="#" data-post-id="<?php echo esc_attr($post_id); ?>" data-bookmarked="<?php echo esc_attr($is_bookmarked ? 'true' : 'false'); ?>">
                                 <svg class="icon icon-<?php echo esc_attr($bookmark_icon); ?>">
@@ -202,7 +202,7 @@
 
                     // Optional: Pagination for multi-page posts
                     wp_link_pages(array(
-                        'before' => '<div class="page-links">' . __('Pages:', 'borspirit'),
+                        'before' => '<div class="page-links">' . __('Pages:', 'gerendashaz'),
                         'after'  => '</div>',
                     ));
                     ?>
@@ -212,7 +212,7 @@
                     <?php if ( $taxonomy ) : ?>
                         <?php 
                             $taxonomy_obj   = get_taxonomy( $taxonomy ); 
-                            $taxonomy_label = $taxonomy_obj ? $taxonomy_obj->labels->name : __('Categories', 'borspirit');
+                            $taxonomy_label = $taxonomy_obj ? $taxonomy_obj->labels->name : __('Categories', 'gerendashaz');
                         ?>
                         <span class="section__categories category">
                             <div class="category__container">
@@ -328,7 +328,7 @@
 
                     <?php if ( !empty($products) ) : ?>
                         <div class="section__related-products">
-                            <h2 class="section__title"><?php echo esc_html__('Related products', 'borspirit'); ?></h2>
+                            <h2 class="section__title"><?php echo esc_html__('Related products', 'gerendashaz'); ?></h2>
 
                             <div class="slider slider--product-query slider--related-products">
                                 <div class="slider__list">
@@ -355,7 +355,7 @@
 
                     <?php if ( $related_posts->have_posts() ) : ?>
                         <div class="section__related-posts">
-                            <h2 class="section__title"><?php echo esc_html__('You may also like…', 'borspirit'); ?></h2>
+                            <h2 class="section__title"><?php echo esc_html__('You may also like…', 'gerendashaz'); ?></h2>
 
                             <div class="slider slider--related" id="related-posts-slider">
                                 <div class="slider__list">
