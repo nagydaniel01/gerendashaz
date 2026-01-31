@@ -247,7 +247,7 @@
                                                 <svg class="icon icon-circle-location-arrow"><use xlink:href="#icon-circle-location-arrow"></use></svg>
                                                 <span>
                                                     <?php echo do_shortcode('[site_address]'); ?><br>
-                                                    <small><?php echo esc_html__('Go to store', 'gerendashaz'); ?></small>
+                                                    <small><?php echo esc_html__('Go to location', 'gerendashaz'); ?></small>
                                                 </span>
                                             </a>
                                         </li>
