@@ -91,7 +91,7 @@
             }
 
             if ( $product && ! $product->is_on_sale() ) {
-                echo wc_custom_sale_flash();
+                echo wc_custom_sale_flash( $product );
             }
         }, 5 );
 
@@ -103,7 +103,7 @@
             }
 
             if ( $product && ! $product->is_on_sale() ) {
-                echo wc_custom_sale_flash();
+                echo wc_custom_sale_flash( $product );
             }
         }, 10 );
     }
@@ -155,7 +155,7 @@
 
     if ( ! function_exists( 'wc_custom_coming_soon_flash' ) ) {
         /**
-         * Badge: Coming Soon (no price).
+         * Badge: Coming soon (no price).
          *
          * @param WC_Product $product WooCommerce product.
          * @return void
@@ -166,7 +166,7 @@
             }
 
             if ( $product->is_type( 'simple' ) && $product->get_price() === '' ) {
-                echo '<span class="badge badge--coming-soon">' . esc_html__( 'Coming Soon', 'gerendashaz' ) . '</span>';
+                echo '<span class="badge badge--coming-soon">' . esc_html__( 'Coming soon', 'gerendashaz' ) . '</span>';
                 return;
             }
 
@@ -175,7 +175,7 @@
 
                 // No variations have price
                 if ( empty( $variation_prices['price'] ) ) {
-                    echo '<span class="badge badge--coming-soon">' . esc_html__( 'Coming Soon', 'gerendashaz' ) . '</span>';
+                    echo '<span class="badge badge--coming-soon">' . esc_html__( 'Coming soon', 'gerendashaz' ) . '</span>';
                     return;
                 }
             }
@@ -184,7 +184,7 @@
 
     if ( ! function_exists( 'wc_custom_new_flash' ) ) {
         /**
-         * Badge: New Arrival (last X days).
+         * Badge: New arrival (last X days).
          *
          * @param WC_Product $product WooCommerce product.
          * @param int        $days_new Days considered as "new".
@@ -200,14 +200,14 @@
             $datediff  = strtotime( $now ) - strtotime( $post_date );
 
             if ( $datediff / DAY_IN_SECONDS <= $days_new ) {
-                echo '<span class="badge badge--new">' . esc_html__( 'New Arrival', 'gerendashaz' ) . '</span>';
+                echo '<span class="badge badge--new">' . esc_html__( 'New arrival', 'gerendashaz' ) . '</span>';
             }
         }
     }
 
     if ( ! function_exists( 'wc_custom_bestseller_flash' ) ) {
         /**
-         * Badge: Best Seller (sales threshold).
+         * Badge: Best seller (sales threshold).
          *
          * @param WC_Product $product WooCommerce product.
          * @param int        $sales_threshold Minimum sales to qualify.
@@ -219,14 +219,14 @@
             }
 
             if ( $product->get_total_sales() >= $sales_threshold ) {
-                echo '<span class="badge badge--bestseller">' . esc_html__( 'Best Seller', 'gerendashaz' ) . '</span>';
+                echo '<span class="badge badge--bestseller">' . esc_html__( 'Best seller', 'gerendashaz' ) . '</span>';
             }
         }
     }
 
     if ( ! function_exists( 'wc_custom_limited_stock_flash' ) ) {
         /**
-         * Badge: Limited Stock.
+         * Badge: Limited stock.
          *
          * @param WC_Product $product WooCommerce product.
          * @param int        $stock_limit Max quantity to trigger badge.
@@ -238,14 +238,14 @@
             }
 
             if ( $product->managing_stock() && $product->get_stock_quantity() <= $stock_limit ) {
-                echo '<span class="badge badge--limited">' . esc_html__( 'Limited Stock', 'gerendashaz' ) . '</span>';
+                echo '<span class="badge badge--limited">' . esc_html__( 'Limited stock', 'gerendashaz' ) . '</span>';
             }
         }
     }
 
     if ( ! function_exists( 'wc_custom_award_flash' ) ) {
         /**
-         * Badge: Award Winning (custom field).
+         * Badge: Award winning (custom field).
          *
          * @param WC_Product $product WooCommerce product.
          * @return void
@@ -264,14 +264,14 @@
                 }
                 */
 
-                echo '<span class="badge badge--award">' . esc_html__( 'Award Winner', 'gerendashaz' ) . '</span>';
+                echo '<span class="badge badge--award">' . esc_html__( 'Award winner', 'gerendashaz' ) . '</span>';
             }
         }
     }
 
     if ( ! function_exists( 'wc_custom_new_vintage_flash' ) ) {
         /**
-         * Badge: New Vintage.
+         * Badge: New vintage.
          *
          * Shows badge if product's pa_evjarat equals the current year.
          *
@@ -291,7 +291,7 @@
 
                 // If any of the terms matches the current year
                 if ( in_array( $current_year, $terms, true ) ) {
-                    echo '<span class="badge badge--new-vintage">' . esc_html__( 'New Vintage', 'gerendashaz' ) . '</span>';
+                    echo '<span class="badge badge--new-vintage">' . esc_html__( 'New vintage', 'gerendashaz' ) . '</span>';
                 }
             }
         }
@@ -299,7 +299,7 @@
 
     if ( ! function_exists( 'wc_custom_category_flash' ) ) {
         /**
-         * Badge: Specific Product Category.
+         * Badge: Specific product category.
          *
          * @param WC_Product $product WooCommerce product.
          * @param string $target_category_slug Slug of the category to display badge for.
@@ -326,7 +326,7 @@
 
     if ( ! function_exists( 'wc_custom_tag_flash' ) ) {
         /**
-         * Badge: Specific Product Tag.
+         * Badge: Specific product tag.
          *
          * @param WC_Product $product WooCommerce product.
          * @param string $target_category_slug Slug of the tag to display badge for.
@@ -353,7 +353,7 @@
 
     if ( ! function_exists( 'wc_custom_winetype_flash' ) ) {
         /**
-         * Badge: Wine Type (custom taxonomy).
+         * Badge: Wine type (custom taxonomy).
          *
          * @param WC_Product $product WooCommerce product.
          * @return void

@@ -1,6 +1,7 @@
 <?php
     $card_image       = $args['card_image'] ?? [];
     $card_title       = $args['card_title'] ?? '';
+    $card_slug        = sanitize_title($card_title);
     $card_description = $args['card_description'] ?? '';
     $card_button      = $args['card_button'] ?? [];
 
@@ -23,7 +24,7 @@
     }
 ?>
 
-<article class="card<?php echo $is_image_card ? ' card--image' : ''; ?>" data-aos="fade-up">
+<article id="<?php echo esc_attr($card_slug); ?>" class="card<?php echo $is_image_card ? ' card--image' : ''; ?>" data-aos="fade-up">
     <?php if ($image_id) : ?>
         <div class="card__header">
             <div class="<?php echo esc_attr($wrapper_class); ?>">

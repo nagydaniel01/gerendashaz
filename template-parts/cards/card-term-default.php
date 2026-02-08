@@ -46,7 +46,7 @@
     }
 ?>
 
-<article class="card card--term<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
+<article id="<?php echo esc_attr($term_id); ?>" class="card card--term<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
     <a href="<?php echo esc_url($term_link); ?>" class="card__link">
         <?php if ($image_id) : ?>
             <div class="card__header">

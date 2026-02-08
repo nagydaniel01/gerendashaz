@@ -21,26 +21,10 @@
     $extra_classes = '';
     if ($post_type) {
         $extra_classes = ' card--'.$post_type;
-
-        /*
-        // Get singular name of post type for ARIA label
-        $post_type_singular_name = '';
-        $post_type_obj = get_post_type_object($post_type);
-        if (is_object($post_type_obj) && isset($post_type_obj->labels->singular_name)) {
-            $post_type_singular_name = mb_strtolower($post_type_obj->labels->singular_name);
-        }
-
-        $aria_label = sprintf(
-            // translators: %1$s is the post title, %2$s is the singular post type name
-            __('A(z) "%1$s" című %2$s megtekintése', 'gerendashaz'),
-            $title,
-            $post_type_singular_name
-        );
-        */
     }
 ?>
 
-<article class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
+<article id="<?php echo esc_attr($post_id); ?>" class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
     <a href="<?php the_permalink(); ?>" class="card__link">
         <?php if ($image_id) : ?>
             <div class="card__header">

@@ -24,7 +24,7 @@
     }
 ?>
 
-<article class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
+<article id="<?php echo esc_attr($post_id); ?>" class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
     <a href="<?php the_permalink(); ?>" class="card__link">
         <?php if ($image_id) : ?>
             <div class="card__header">
