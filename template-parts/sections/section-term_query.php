@@ -15,20 +15,47 @@ $target      = isset($link['target']) && $link['target'] !== '' ? $link['target'
 $is_external = is_external_url($url, get_home_url());
 
 // Columns (ACF number field: 1–6)
-$columns = (int) ($section['term_query_columns'] ?: 3);
-$columns = max(1, min(6, $columns));
+$acf_columns = $section['post_query_columns_columns'] ?? [];
+$acf_columns = is_array($acf_columns) ? $acf_columns : [];
 
-// Calculate Bootstrap column size
-$col_size = 12 / $columns;
+$default_columns = [
+    'xs'  => 1,
+    'sm'  => 1,
+    'md'  => 2,
+    'lg'  => 2,
+    'xl'  => 3,
+    'xxl' => 3,
+];
 
-// Valid Bootstrap column sizes
-$valid_cols = [1, 2, 3, 4, 6, 12];
-if (!in_array($col_size, $valid_cols, true)) {
-    $col_size = 4; // fallback (3 columns)
+// Merge user-defined columns with defaults, only if not empty
+foreach ($default_columns as $bp => $default) {
+    if (isset($acf_columns[$bp]) && trim($acf_columns[$bp]) !== '') {
+        $default_columns[$bp] = (int) $acf_columns[$bp];
+    }
 }
 
-// Responsive column classes
-$col_class = 'col-12 col-md-6 col-lg-' . $col_size;
+// Now $columns contains the final values
+$columns = $default_columns;
+
+// Map breakpoints to Bootstrap prefixes
+$breakpoints = [
+    'xs'  => '',      
+    'sm'  => 'sm',    
+    'md'  => 'md',    
+    'lg'  => 'lg',    
+    'xl'  => 'xl',    
+    'xxl' => 'xxl',   
+];
+
+$col_classes = [];
+foreach ($breakpoints as $bp => $prefix) {
+    $num_columns = $columns[$bp]; // already int and valid
+    $num_columns = max(1, min(6, $num_columns)); // clamp to 1-6
+    $col_size = (int) round(12 / $num_columns);
+    $col_classes[] = 'col' . ($prefix ? '-' . $prefix : '') . '-' . $col_size;
+}
+
+$col_class = implode(' ', $col_classes);
 
 $query_args = [
     'taxonomy'   => $section['taxonomy_type'] ?? 'category',

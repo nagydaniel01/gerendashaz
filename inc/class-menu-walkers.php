@@ -106,6 +106,11 @@ if ( ! class_exists( 'Custom_Bootstrap_Nav_Walker' ) ) {
                 'class'        => implode( ' ', $a_classes ),
             ];
 
+            // Add 'nav__current' class if this is the current menu item
+            if ( ! empty( $item->current ) || ! empty( $item->current_item_ancestor ) ) {
+                $atts['class'] .= ' nav__current';
+            }
+
             $atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args, $depth );
             $attributes = $this->build_atts( $atts );
 

@@ -80,7 +80,7 @@
     }
 
 	.card__title {
-		font-size: 1.4rem;
+		font-size: 1.125rem;
 		font-weight: 600;
 		text-align: left;
 		margin: 0;
@@ -197,8 +197,12 @@
 	}
 }
 
-@include media-breakpoint-only(xl) {
+@include media-breakpoint-up(xl) {
 	.card {
+		.card__title {
+			font-size: 1.5rem;
+		}
+
 		.card__meta {
 			flex-direction: column;
 			align-items: flex-start;

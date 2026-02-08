@@ -29,7 +29,7 @@
             register_setting( 'ag_options_group', 'ag_modal_btn_yes', 'sanitize_text_field' );
             register_setting( 'ag_options_group', 'ag_modal_btn_no', 'sanitize_text_field' );
         }
-        add_action( 'admin_init', 'ag_register_settings' );
+        //add_action( 'admin_init', 'ag_register_settings' );
     }
 
     /**
@@ -45,7 +45,7 @@
                 'ag_options_page'
             );
         }
-        add_action( 'admin_menu', 'ag_register_options_page' );
+        //add_action( 'admin_menu', 'ag_register_options_page' );
     }
 
     /**

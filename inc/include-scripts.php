@@ -34,22 +34,22 @@
 
                     // Localize Fancybox translations
                     'gallery' => array(
-                        'NEXT'  => __( 'Következő kép a galériában', 'gerendashaz' ),
-                        'PREV'  => __( 'Előző kép a galériában', 'gerendashaz' ),
-                        'CLOSE' => __( 'Bezárás', 'gerendashaz' ),
+                        'NEXT'  => __( 'Next image in gallery', 'gerendashaz' ),
+                        'PREV'  => __( 'Previous image in gallery', 'gerendashaz' ),
+                        'CLOSE' => __( 'Close', 'gerendashaz' ),
                     ),
 
                     // Localize Dropzone translations
                     'dropzone' => array(
-                        'defaultMessage'            => __( 'Húzza ide a fájlokat, vagy kattintson a feltöltéshez', 'gerendashaz' ),
-                        'fallbackMessage'           => __( 'A böngészője nem támogatja a fájlok húzását és ejtését.', 'gerendashaz' ),
-                        'fileTooBig'                => __( 'A fájl túl nagy ({{filesize}} MB). Maximális méret: {{maxFilesize}} MB.', 'gerendashaz' ),
-                        'invalidFileType'           => __( 'Ez a fájltípus nem engedélyezett.', 'gerendashaz' ),
-                        'responseError'             => __( 'A szerver {{statusCode}} hibát adott vissza.', 'gerendashaz' ),
-                        'cancelUpload'              => __( 'Feltöltés megszakítása', 'gerendashaz' ),
-                        'cancelUploadConfirmation'  => __( 'Biztosan megszakítja a feltöltést?', 'gerendashaz' ),
-                        'removeFile'                => __( 'Fájl törlése', 'gerendashaz' ),
-                        'maxFilesExceeded'          => __( 'Nem tölthet fel több fájlt.', 'gerendashaz' ),
+                        'defaultMessage'            => __( 'Drag files here or click to upload', 'gerendashaz' ),
+                        'fallbackMessage'           => __( 'Your browser does not support drag and drop file uploads.', 'gerendashaz' ),
+                        'fileTooBig'                => __( 'File is too big ({{filesize}} MB). Max filesize: {{maxFilesize}} MB.', 'gerendashaz' ),
+                        'invalidFileType'           => __( 'This file type is not allowed.', 'gerendashaz' ),
+                        'responseError'             => __( 'Server responded with {{statusCode}} error.', 'gerendashaz' ),
+                        'cancelUpload'              => __( 'Cancel upload', 'gerendashaz' ),
+                        'cancelUploadConfirmation'  => __( 'Are you sure you want to cancel this upload?', 'gerendashaz' ),
+                        'removeFile'                => __( 'Remove file', 'gerendashaz' ),
+                        'maxFilesExceeded'          => __( 'You cannot upload any more files.', 'gerendashaz' ),
                     ),
                 ),
             ) );
@@ -146,7 +146,7 @@
             } );
         }
 
-        add_action( 'wp_enqueue_scripts', 'gtm_script', 120 );
+        //add_action( 'wp_enqueue_scripts', 'gtm_script', 120 );
     }
 
     if ( ! function_exists( 'fb_meta_pixel_script' ) ) {
@@ -192,7 +192,7 @@
             // Add the noscript pixel
             echo '<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=' . esc_attr($fb_pixel_id) . '&ev=PageView&noscript=1" /></noscript>';
         }
-        add_action( 'wp_enqueue_scripts', 'fb_meta_pixel_script', 120 );
+        //add_action( 'wp_enqueue_scripts', 'fb_meta_pixel_script', 120 );
     }
 
     if ( ! function_exists( 'custom_gtm_push' ) ) {
@@ -224,7 +224,7 @@
             ];
             custom_gtm_push( $page_data );
         }
-        add_action( 'wp_footer', 'custom_gtm_push_page_view' );
+        //add_action( 'wp_footer', 'custom_gtm_push_page_view' );
     }
 
     if ( ! function_exists( 'custom_gtm_push_view_cart' ) ) {
@@ -259,7 +259,7 @@
                 ]);
             }
         }
-        add_action( 'wp_footer', 'custom_gtm_push_view_cart' );
+        //add_action( 'wp_footer', 'custom_gtm_push_view_cart' );
     }
 
     if ( ! function_exists( 'custom_gtm_push_product_view' ) ) {
@@ -286,7 +286,7 @@
                 'ecommerce' => ['items' => $items]
             ]);
         }
-        add_action( 'woocommerce_before_single_product', 'custom_gtm_push_product_view' );
+        //add_action( 'woocommerce_before_single_product', 'custom_gtm_push_product_view' );
     }
 
     if ( ! function_exists( 'custom_gtm_push_add_to_cart' ) ) {
@@ -328,7 +328,7 @@
             </script>
             <?php
         }
-        add_action( 'woocommerce_after_add_to_cart_button', 'custom_gtm_push_add_to_cart' );
+        //add_action( 'woocommerce_after_add_to_cart_button', 'custom_gtm_push_add_to_cart' );
     }
 
     if ( ! function_exists( 'custom_gtm_remove_from_cart_script' ) ) {
@@ -359,7 +359,7 @@
             </script>
             <?php
         }
-        add_action('wp_footer', 'custom_gtm_remove_from_cart_script');
+        //add_action('wp_footer', 'custom_gtm_remove_from_cart_script');
     }
 
     if ( ! function_exists( 'custom_gtm_begin_checkout' ) ) {
@@ -386,7 +386,7 @@
                 'ecommerce' => ['items' => $items]
             ]);
         }
-        add_action( 'woocommerce_checkout_before_customer_details', 'custom_gtm_begin_checkout' );
+        //add_action( 'woocommerce_checkout_before_customer_details', 'custom_gtm_begin_checkout' );
     }
 
     if ( ! function_exists( 'custom_gtm_push_purchase' ) ) {
@@ -422,5 +422,5 @@
                 ]
             ]);
         }
-        add_action( 'woocommerce_thankyou', 'custom_gtm_push_purchase' );
+        //add_action( 'woocommerce_thankyou', 'custom_gtm_push_purchase' );
     }

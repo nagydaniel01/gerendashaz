@@ -351,35 +351,26 @@
                             "ui": 1
                         },
                         {
-                            "key": "field_696e86307ac33",
-                            "label": "Oszlopok száma",
+                            "key": "field_698757c944045",
+                            "label": "Oszlopok",
                             "name": "card_columns",
                             "aria-label": "",
-                            "type": "number",
+                            "type": "clone",
                             "instructions": "",
                             "required": 0,
-                            "conditional_logic": [
-                                [
-                                    {
-                                        "field": "field_68c1b070554fd",
-                                        "operator": "!=",
-                                        "value": "1"
-                                    }
-                                ]
-                            ],
+                            "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": 3,
-                            "min": 1,
-                            "max": 6,
-                            "allow_in_bindings": 0,
-                            "placeholder": "",
-                            "step": "",
-                            "prepend": "",
-                            "append": ""
+                            "clone": [
+                                "group_698756f3dce05"
+                            ],
+                            "display": "seamless",
+                            "layout": "block",
+                            "prefix_label": 0,
+                            "prefix_name": 1
                         },
                         {
                             "key": "field_68c161d3e5a55",
@@ -576,31 +567,22 @@
                             "label": "Oszlopok száma",
                             "name": "post_query_columns",
                             "aria-label": "",
-                            "type": "number",
+                            "type": "clone",
                             "instructions": "",
                             "required": 0,
-                            "conditional_logic": [
-                                [
-                                    {
-                                        "field": "field_68af1a184229a",
-                                        "operator": "!=",
-                                        "value": "1"
-                                    }
-                                ]
-                            ],
+                            "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": 3,
-                            "min": 1,
-                            "max": 6,
-                            "allow_in_bindings": 0,
-                            "placeholder": "",
-                            "step": "",
-                            "prepend": "",
-                            "append": ""
+                            "clone": [
+                                "group_698756f3dce05"
+                            ],
+                            "display": "seamless",
+                            "layout": "block",
+                            "prefix_label": 0,
+                            "prefix_name": 1
                         },
                         {
                             "key": "field_68af060f14a37",
@@ -1580,31 +1562,22 @@
                             "label": "Oszlopok száma",
                             "name": "term_query_columns",
                             "aria-label": "",
-                            "type": "number",
+                            "type": "clone",
                             "instructions": "",
                             "required": 0,
-                            "conditional_logic": [
-                                [
-                                    {
-                                        "field": "field_68af1a184229a",
-                                        "operator": "!=",
-                                        "value": "1"
-                                    }
-                                ]
-                            ],
+                            "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": 3,
-                            "min": 1,
-                            "max": 6,
-                            "allow_in_bindings": 0,
-                            "placeholder": "",
-                            "step": "",
-                            "prepend": "",
-                            "append": ""
+                            "clone": [
+                                "group_698756f3dce05"
+                            ],
+                            "display": "seamless",
+                            "layout": "block",
+                            "prefix_label": 0,
+                            "prefix_name": 1
                         },
                         {
                             "key": "field_68b03e2bad6a6",
@@ -4178,5 +4151,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1769587589
+    "modified": 1770482653
 }
