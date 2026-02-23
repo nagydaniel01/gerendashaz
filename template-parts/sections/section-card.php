@@ -66,22 +66,27 @@
 ?>
 
 <?php if (!empty($card_items)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--card<?php echo esc_attr($section_classes); ?><?php echo ($slider != false) ? ' section--slider' : ''; ?>">
-        <div class="container">
-            <?php if (!$is_image_slider && (($section_title && $section_hide_title !== true) || $section_lead)) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--card' . esc_attr($section_classes) . ($slider != false ? ' section--slider' : ''),
+    ]); ?>
 
-            <div class="section__content">
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php 
+            if (!$is_image_slider) {
+                do_action('theme_section_header', [
+                    'title'      => $section_title,
+                    'hide_title' => $section_hide_title,
+                    'lead'       => $section_lead,
+                ]); 
+            }
+            ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+            
                 <?php if ($slider != false) : ?>
-                    <div class="slider<?php echo !$is_image_slider ? ' slider--card' : ' slider--image'; ?>">
+                    <div class="slider<?php echo !$is_image_slider ? ' slider--card' : ' slider--logo'; ?>">
                         <div class="slider__list">
                             <?php foreach ($card_items as $key => $item) : ?>
                                 <div class="slider__item">
@@ -120,7 +125,10 @@
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
-    </section>
+
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

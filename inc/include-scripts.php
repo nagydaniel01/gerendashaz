@@ -86,7 +86,7 @@
             wp_dequeue_style( 'brands-styles' );
             wp_deregister_style( 'brands-styles' );
         }
-        add_action( 'wp_enqueue_scripts', 'theme_scripts', 100 );
+        add_action( 'wp_enqueue_scripts', 'theme_scripts', 1 );
     }
 
     if ( ! function_exists( 'recaptcha_scripts' ) ) {

@@ -6,6 +6,26 @@
     if ( ! class_exists( 'WooCommerce' ) ) {
         return;
     }
+
+    /**
+     * Check if current pa_boraszat term has gallery or video.
+     */
+    function pa_boraszat_has_media() {
+        if ( ! is_tax( 'pa_boraszat' ) ) {
+            return false;
+        }
+
+        $term = get_queried_object();
+
+        if ( empty( $term ) || ! isset( $term->term_id, $term->taxonomy ) ) {
+            return false;
+        }
+
+        $gallery = get_field( 'gallery', $term->taxonomy . '_' . $term->term_id );
+        $video   = get_field( 'video', $term->taxonomy . '_' . $term->term_id );
+
+        return ( ! empty( $gallery ) || ! empty( $video ) );
+    }
     
     if ( ! function_exists( 'custom_product_header_wrapper' ) ) {
         /**
@@ -16,13 +36,16 @@
          */
         function custom_product_header_wrapper() {
             if ( is_tax( 'pa_boraszat' ) ) {
-                echo '<div class="woocommerce-products-header__inner row flex-row-reverse"><div class="col-md-7">';
+                $col_class = pa_boraszat_has_media() ? 'col-md-7' : 'col-md-12';
+
+                echo '<div class="woocommerce-products-header__inner row flex-row-reverse">';
+                echo '<div class="' . esc_attr( $col_class ) . '">';
             }
 
             // Output the page title
             echo '<h1 class="woocommerce-products-header__title page-title">' . woocommerce_page_title( false ) . '</h1>';
         }
-        add_action( 'woocommerce_show_page_title', 'custom_product_header_wrapper', 10 );
+        //add_action( 'woocommerce_show_page_title', 'custom_product_header_wrapper', 10 );
     }
 
     if ( ! function_exists( 'custom_product_header_wrapper_end' ) ) {
@@ -37,7 +60,7 @@
                 echo '</div>';
             }
         }
-        add_action( 'woocommerce_archive_description', 'custom_product_header_wrapper_end', 15 );
+        //add_action( 'woocommerce_archive_description', 'custom_product_header_wrapper_end', 15 );
     }
 
     if ( ! function_exists( 'my_wc_add_boraszat_gallery_in_shop_loop_header' ) ) {
@@ -128,5 +151,5 @@
 
             echo '</div></div>';
         }
-        add_action( 'woocommerce_archive_description', 'my_wc_add_boraszat_gallery_in_shop_loop_header', 10 );
+        //add_action( 'woocommerce_archive_description', 'my_wc_add_boraszat_gallery_in_shop_loop_header', 10 );
     }

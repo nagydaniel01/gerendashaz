@@ -17,30 +17,33 @@
 ?>
 
 <?php if (!empty($gallery)) : ?>
-    <section id="<?php echo esc_attr($section_id); ?>" class="section section--gallery<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_id,
+        'classes' => 'section section--gallery' . esc_attr($section_classes),
+    ]); ?>
 
-            <div class="section__content">
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php 
+            do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); 
+            ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php if ($gallery_type === 'slider') : ?>
                     <div class="slider slider--gallery" id="<?php echo esc_attr($slider_id); ?>">
                         <div class="slider__list">
-                            <?php foreach($gallery as $image) : ?>
+                            <?php foreach($gallery as $index => $image) : ?>
                                 <figure class="slider__item">
                                     <?php if($use_fancybox): ?>
                                         <a href="<?php echo esc_url($image['url']); ?>" class="slider__link" data-fancybox="<?php echo esc_attr($fancybox_id); ?>" <?php if(!empty($image['caption'])): ?>data-caption="<?php echo esc_attr($image['caption']); ?>"<?php endif; ?>>
                                     <?php endif; ?>
                                     
-                                    <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>" class="slider__image">
+                                    <img src="<?php echo esc_url($image['sizes']['medium']); ?>" alt="<?php echo esc_attr($image['alt'] ?: ($image['caption'] ?: (sprintf( __('Image of %s %d', 'gerendashaz'), $section_title ?: __('Gallery image', 'gerendashaz'), $index + 1)))); ?>" class="slider__image">
 
                                     <?php if($use_fancybox): ?>
                                         </a>
@@ -53,13 +56,13 @@
                 <?php else : // masonry/grid ?>
                     <div class="row gy-4 grid" id="<?php echo esc_attr($grid_id); ?>" style="position: relative;">
                         <div class="grid-sizer col-12 col-md-6 col-xl-3"></div>
-                        <?php foreach($gallery as $image) : ?>
+                        <?php foreach($gallery as $index => $image) : ?>
                             <div class="grid-item col-12 col-md-6 col-xl-3">
                                 <?php if($use_fancybox): ?>
                                     <a href="<?php echo esc_url($image['url']); ?>" class="slider__link" data-fancybox="<?php echo esc_attr($fancybox_id); ?>" <?php if(!empty($image['caption'])): ?>data-caption="<?php echo esc_attr($image['caption']); ?>"<?php endif; ?>>
                                 <?php endif; ?>
                                 
-                                <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>" class="gallery-image">
+                                <img src="<?php echo esc_url($image['sizes']['medium']); ?>" alt="<?php echo esc_attr($image['alt'] ?: ($image['caption'] ?: (sprintf( __('Image of %s %d', 'gerendashaz'), $section_title ?: __('Gallery image', 'gerendashaz'), $index + 1)))); ?>" class="gallery-image">
                                 
                                 <?php if($use_fancybox): ?>
                                     </a>
@@ -68,7 +71,10 @@
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
-    </section>
+                
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

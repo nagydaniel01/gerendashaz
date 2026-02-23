@@ -133,8 +133,13 @@ $post_query = new WP_Query($query_args);
 ?>
 
 <?php if ($post_query->have_posts()) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--post_query<?php echo esc_attr($section_classes); ?><?php echo ($slider != false) ? ' section--slider' : ''; ?>">
-        <div class="container">
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--post_query' . esc_attr($section_classes) . ($slider ? ' section--slider' : ''),
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+        
             <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
                 <div class="section__header">
                     <?php if ($section_hide_title !== true) : ?>
@@ -158,7 +163,8 @@ $post_query = new WP_Query($query_args);
                 </div>
             <?php endif; ?>
 
-            <div class="section__content">
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php if ( $slider != false ) : ?>
                     <div class="slider slider--post-query">
                         <div class="slider__list">
@@ -209,7 +215,10 @@ $post_query = new WP_Query($query_args);
                         <?php wp_reset_postdata(); ?>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
-    </section>
+                
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

@@ -23,20 +23,21 @@
 ?>
 
 <?php if (!empty($orders)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--customer_reviews<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--customer_reviews' . esc_attr($section_classes),
+    ]); ?>
 
-            <div class="section__content">
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php if ( $slider != false ) : ?>
                     <div class="slider slider--post-query">
                         <div class="slider__list">
@@ -77,7 +78,10 @@
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
-    </section>
+                
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

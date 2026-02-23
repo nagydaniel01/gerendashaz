@@ -17,26 +17,31 @@
 ?>
 
 <?php if (!empty($file_url) && shortcode_exists('real3dflipbook')) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--flipbook<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--flipbook' . esc_attr($section_classes),
+    ]); ?>
 
-            <div class="section__content">
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php echo do_shortcode('[real3dflipbook id="1" pdf="' . esc_url($file_url) . '"]'); ?>
+
                 <a href="<?php echo esc_url($file_url); ?>" target="_self" aria-label="<?php echo esc_attr($aria_label); ?>" download class="section__button btn btn-primary">
                     <span><?php echo esc_html__('Download PDF', 'gerendashaz'); ?></span>
                     <svg class="icon icon-download"><use xlink:href="#icon-download"></use></svg>
                 </a>
-            </div>    
-        </div>
-    </section>
+                
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

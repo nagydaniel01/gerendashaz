@@ -39,27 +39,31 @@
 ?>
 
 <?php if ($featured_object || (!empty($final_title) && !empty($featured_description) && !empty($final_image))) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--featured<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo wp_kses_post($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--featured' . esc_attr($section_classes),
+    ]); ?>
 
-            <div class="section__content">
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php 
+            // Render the section header via the action
+            do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); 
+            ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php if (!empty($final_image) && is_array($final_image) && !empty($final_image['ID'])) : ?>
                     <div class="section__image-wrapper" data-aos="fade-up">
                         <?php 
                             $image_id = $final_image['ID'];
                             $alt_text = get_post_meta($image_id, '_wp_attachment_image_alt', true) ?: $final_title;
 
-                            echo wp_get_attachment_image($image_id, 'full', false, [
+                            echo wp_get_attachment_image($image_id, 'large', false, [
                                 'class' => 'section__image',
                                 'alt'   => $alt_text,
                                 'loading' => 'lazy'
@@ -87,7 +91,10 @@
                         <a href="<?php echo esc_url($final_button_url); ?>" target="<?php echo esc_attr($final_button_target); ?>" class="btn btn-outline-primary btn-lg"><?php echo esc_html($final_button_text); ?></a>
                     <?php endif; ?>
                 </div>
-            </div>
-        </div>
-    </section>
+            
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

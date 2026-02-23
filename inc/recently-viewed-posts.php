@@ -15,6 +15,18 @@
         add_action( 'init', 'start_custom_session', 1 );
     }
 
+    if ( ! function_exists( 'close_custom_session' ) ) {
+        /**
+         * Close the session at the end of request to avoid blocking REST API or AJAX calls.
+         */
+        function close_custom_session() {
+            if ( session_id() ) {
+                session_write_close();
+            }
+        }
+        add_action( 'shutdown', 'close_custom_session' );
+    }
+
     if ( ! function_exists( 'add_recently_viewed' ) ) {
         /**
          * Add a post to the recently viewed list stored in the session.
@@ -31,10 +43,7 @@
             $_SESSION['recently_viewed'] = array_unique( $_SESSION['recently_viewed'] );
 
             // Optional: limit the number of items stored (e.g., last 10 posts)
-            //$_SESSION['recently_viewed'] = array_slice( $_SESSION['recently_viewed'], 0, 10 );
-
-            // Immediately close the session to prevent blocking other requests
-            session_write_close();
+            // $_SESSION['recently_viewed'] = array_slice( $_SESSION['recently_viewed'], 0, 10 );
         }
     }
 

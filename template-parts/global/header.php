@@ -1,6 +1,5 @@
 <?php
-    $site_name = get_bloginfo('name') ?: get_field('site_name', 'option') ?: '';
-
+    $site_name      = get_bloginfo('name') ?: get_field('site_name', 'option') ?: '';
     $custom_logo_id = get_theme_mod('custom_logo') ?? null;
     $acf_logo       = get_field('site_logo', 'option') ?? null;
     $site_logo      = null;
@@ -135,10 +134,12 @@
                                     'menu_class'     => 'navbar-nav nav__list level0',
                                     'fallback_cb'    => false,
                                     'depth'          => 4,
-                                    'walker'         => $walker,
+                                    'walker'         => $walker
                                 ) );
                             } else {
-                                echo '<p class="no-menu-assigned">' . esc_html__( 'Please assign a menu in Appearance → Menus.', 'gerendashaz' ) . '</p>';
+                                wp_nav_menu( array(
+                                    'theme_location' => 'primary_menu'
+                                ) );
                             }
 
                         } else {

@@ -61,6 +61,5 @@
                 }
             });
         }
-
         add_action( 'init', 'conditionally_disable_comments' );
     }

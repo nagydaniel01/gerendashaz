@@ -202,6 +202,5 @@
 
             return $items;
         }
-
-        add_filter( 'wp_nav_menu_objects', 'dynamic_wineries_menu', 10, 2 );
+        //add_filter( 'wp_nav_menu_objects', 'dynamic_wineries_menu', 10, 2 );
     }

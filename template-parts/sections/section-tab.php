@@ -31,18 +31,21 @@
 ?>
 
 <?php if (!empty($tab_items)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--tab<?php echo esc_attr($section_classes); ?><?php echo esc_attr($extra_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--tab' . esc_attr($section_classes) . esc_attr($extra_classes),
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php 
+            // Section header
+            do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); 
+            ?>
             
             <div class="section__content<?php echo $is_vertical ? ' d-flex' : ''; ?>">
                 <ul class="nav <?php echo esc_attr($nav_class); ?><?php echo $is_vertical ? ' flex-column me-3' : ' mb-3'; ?>" 
@@ -76,6 +79,8 @@
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
-    </section>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

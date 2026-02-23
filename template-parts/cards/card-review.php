@@ -19,7 +19,7 @@
 
 <div class="card card--review" data-aos="fade-up">
     <div class="card__content">
-        <h3 class="card__title"><?php echo esc_html($customer_first_name ?: __('Anonymous', 'gerendashaz')); ?></h3>
+        <h2 class="card__title"><?php echo esc_html($customer_first_name ?: __('Anonymous', 'gerendashaz')); ?></h2>
 
         <?php if ($stars) : ?>
             <div class="card__rating"><?php echo $stars; ?></div>

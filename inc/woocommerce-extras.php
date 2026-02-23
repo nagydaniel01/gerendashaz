@@ -8,25 +8,25 @@
     }
 
     // ============================================================
-    // 1. WOOCOMMERCE - BORSPIRIT SETTINGS PAGE
+    // 1. WOOCOMMERCE - gerendashaz SETTINGS PAGE
     // ============================================================
     
-    if ( ! function_exists( 'gerendashaz_add_settings_tab' ) ) {
+    if ( ! function_exists( 'my_theme_add_settings_tab' ) ) {
         /**
          * Add Custom Settings tab to WooCommerce settings tabs.
          */
-        function gerendashaz_add_settings_tab( $tabs ) {
-            $tabs['gerendashaz_settings'] = __( 'Custom Settings', 'gerendashaz' );
+        function my_theme_add_settings_tab( $tabs ) {
+            $tabs['my_theme_settings'] = __( 'Custom Settings', 'gerendashaz' );
             return $tabs;
         }
-        add_filter( 'woocommerce_settings_tabs_array', 'gerendashaz_add_settings_tab', 50 );
+        add_filter( 'woocommerce_settings_tabs_array', 'my_theme_add_settings_tab', 50 );
     }
 
-    if ( ! function_exists( 'gerendashaz_settings_tab_content' ) ) {
+    if ( ! function_exists( 'my_theme_settings_tab_content' ) ) {
         /**
          * Render Custom Settings tab content with section-based subtabs.
          */
-        function gerendashaz_settings_tab_content() {
+        function my_theme_settings_tab_content() {
 
             // Use 'section' instead of 'subtab'
             $current_section = isset( $_GET['section'] ) ? sanitize_text_field( $_GET['section'] ) : 'general';
@@ -36,57 +36,57 @@
             $display_class = $current_section === 'display' ? 'current' : '';
 
             echo '<ul class="subsubsub">';
-            echo '<li><a href="' . admin_url( 'admin.php?page=wc-settings&tab=gerendashaz_settings&section=general' ) . '" class="' . $general_class . '">' . __( 'General Settings', 'gerendashaz' ) . '</a> | </li>';
-            echo '<li><a href="' . admin_url( 'admin.php?page=wc-settings&tab=gerendashaz_settings&section=display' ) . '" class="' . $display_class . '">' . __( 'Display Setting', 'gerendashaz' ) . '</a></li>';
+            echo '<li><a href="' . admin_url( 'admin.php?page=wc-settings&tab=my_theme_settings&section=general' ) . '" class="' . $general_class . '">' . __( 'General Settings', 'gerendashaz' ) . '</a> | </li>';
+            echo '<li><a href="' . admin_url( 'admin.php?page=wc-settings&tab=my_theme_settings&section=display' ) . '" class="' . $display_class . '">' . __( 'Display Setting', 'gerendashaz' ) . '</a></li>';
             echo '</ul>';
 
             echo '<br class="clear">';
 
             // Render fields based on section
             if ( $current_section === 'display' ) {
-                woocommerce_admin_fields( gerendashaz_settings_display() );
+                woocommerce_admin_fields( my_theme_settings_display() );
             } else {
-                woocommerce_admin_fields( gerendashaz_settings_general() );
+                woocommerce_admin_fields( my_theme_settings_general() );
             }
         }
-        add_action( 'woocommerce_settings_tabs_gerendashaz_settings', 'gerendashaz_settings_tab_content' );
+        add_action( 'woocommerce_settings_tabs_my_theme_settings', 'my_theme_settings_tab_content' );
     }
 
     /**
      * Save Custom Settings tab options per section.
      */
-    if ( ! function_exists( 'gerendashaz_update_settings' ) ) {
-        function gerendashaz_update_settings() {
+    if ( ! function_exists( 'my_theme_update_settings' ) ) {
+        function my_theme_update_settings() {
 
             $current_section = isset( $_GET['section'] ) ? sanitize_text_field( $_GET['section'] ) : 'general';
 
             if ( $current_section === 'display' ) {
-                woocommerce_update_options( gerendashaz_settings_display() );
+                woocommerce_update_options( my_theme_settings_display() );
             } else {
-                woocommerce_update_options( gerendashaz_settings_general() );
+                woocommerce_update_options( my_theme_settings_general() );
             }
         }
-        add_action( 'woocommerce_update_options_gerendashaz_settings', 'gerendashaz_update_settings' );
+        add_action( 'woocommerce_update_options_my_theme_settings', 'my_theme_update_settings' );
     }
 
-    if ( ! function_exists( 'gerendashaz_settings_general' ) ) {
+    if ( ! function_exists( 'my_theme_settings_general' ) ) {
         /**
          * General Settings section fields.
          *
          * @return array Settings fields for General tab.
          */
-        function gerendashaz_settings_general() {
+        function my_theme_settings_general() {
             return [
                 'section_title' => [
                     'name' => __( 'General Settings', 'gerendashaz' ),
                     'type' => 'title',
-                    'id'   => 'gerendashaz_general_section_title',
+                    'id'   => 'my_theme_general_section_title',
                 ],
 
                 'club_discount_amount' => [
                     'name'              => __( 'Club Discount Amount', 'gerendashaz' ),
                     'type'              => 'number',
-                    'id'                => 'gerendashaz_club_discount_amount',
+                    'id'                => 'my_theme_club_discount_amount',
                     'desc'              => __( 'Enter the club discount amount.', 'gerendashaz' ),
                     'placeholder'       => '5',
                     'custom_attributes' => [
@@ -98,30 +98,30 @@
 
                 'section_end' => [
                     'type' => 'sectionend',
-                    'id'   => 'gerendashaz_general_section_end',
+                    'id'   => 'my_theme_general_section_end',
                 ],
             ];
         }
     }
 
-    if ( ! function_exists( 'gerendashaz_settings_display' ) ) {
+    if ( ! function_exists( 'my_theme_settings_display' ) ) {
         /**
          * Display Setting section fields.
          *
          * @return array Settings fields for Display Setting tab.
          */
-        function gerendashaz_settings_display() {
+        function my_theme_settings_display() {
             return [
                 'section_title' => [
                     'name' => __( 'Display Setting', 'gerendashaz' ),
                     'type' => 'title',
-                    'id'   => 'gerendashaz_display_section_title',
+                    'id'   => 'my_theme_display_section_title',
                 ],
 
                 'regular_price_label' => [
                     'name'        => __( 'Regular Price Label', 'gerendashaz' ),
                     'type'        => 'text',
-                    'id'          => 'gerendashaz_regular_price_label',
+                    'id'          => 'my_theme_regular_price_label',
                     'desc'        => __( 'Enter the label for the regular price.', 'gerendashaz' ),
                     'placeholder' => __( 'Regular Price', 'gerendashaz' ),
                 ],
@@ -129,7 +129,7 @@
                 'club_price_label' => [
                     'name'        => __( 'Club Price Label', 'gerendashaz' ),
                     'type'        => 'text',
-                    'id'          => 'gerendashaz_club_price_label',
+                    'id'          => 'my_theme_club_price_label',
                     'desc'        => __( 'Enter the label for the club price.', 'gerendashaz' ),
                     'placeholder' => __( 'Club Price', 'gerendashaz' ),
                 ],
@@ -137,14 +137,14 @@
                 'savings_label' => [
                     'name'        => __( 'Savings Label', 'gerendashaz' ),
                     'type'        => 'text',
-                    'id'          => 'gerendashaz_savings_label',
+                    'id'          => 'my_theme_savings_label',
                     'desc'        => __( 'Enter the label for the savings displayed on sale products.', 'gerendashaz' ),
                     'placeholder' => __( 'You Save', 'gerendashaz' ),
                 ],
 
                 'section_end' => [
                     'type' => 'sectionend',
-                    'id'   => 'gerendashaz_display_section_end',
+                    'id'   => 'my_theme_display_section_end',
                 ],
             ];
         }
@@ -1031,14 +1031,14 @@
     // 11. PRICE MODIFICATIONS
     // ============================================================
 
-    if ( ! function_exists( 'gerendashaz_is_club_member' ) ) {
+    if ( ! function_exists( 'my_theme_is_club_member' ) ) {
         /**
          * Check if user is club member (spent 50 000+ HUF)
          *
          * @param int $user_id Optional user ID.
          * @return bool True if user spent >= 100000 HUF.
          */
-        function gerendashaz_is_club_member( $user_id = 0 ) {
+        function my_theme_is_club_member( $user_id = 0 ) {
             try {
                 if ( ! $user_id ) {
                     $user_id = get_current_user_id();
@@ -1061,7 +1061,7 @@
         }
     }
 
-    if ( ! function_exists( 'gerendashaz_add_label_before_price' ) ) {
+    if ( ! function_exists( 'my_theme_add_label_before_price' ) ) {
         /**
          * Add custom label before regular price on product pages.
          *
@@ -1069,7 +1069,7 @@
          * @param WC_Product $product WooCommerce product object.
          * @return string Modified price HTML.
          */
-        function gerendashaz_add_label_before_price( $price, $product ) {
+        function my_theme_add_label_before_price( $price, $product ) {
             try {
                 if ( is_admin() ) {
                     return $price;
@@ -1087,7 +1087,7 @@
                     return $price;
                 }
 
-                $regular_label = get_option( 'gerendashaz_regular_price_label', __( 'Shelf price', 'gerendashaz' ) );
+                $regular_label = get_option( 'my_theme_regular_price_label', __( 'Shelf price', 'gerendashaz' ) );
                 $label = '<span class="price-label">' . esc_html( $regular_label ) . ': </span>';
                 return $label . '<span>' . $price . '</span>';
 
@@ -1096,17 +1096,17 @@
                 return $price;
             }
         }
-        add_filter( 'woocommerce_get_price_html', 'gerendashaz_add_label_before_price', 10, 2 );
+        add_filter( 'woocommerce_get_price_html', 'my_theme_add_label_before_price', 10, 2 );
     }
 
-    if ( ! function_exists( 'gerendashaz_add_club_price_field' ) ) {
+    if ( ! function_exists( 'my_theme_add_club_price_field' ) ) {
         /**
          * Adds backend custom field for manual club price.
          */
-        function gerendashaz_add_club_price_field() {
+        function my_theme_add_club_price_field() {
             try {
                 // Get discount from options (default 5)
-                $discount = floatval( get_option( 'gerendashaz_club_discount_amount', 0 ) );
+                $discount = floatval( get_option( 'my_theme_club_discount_amount', 0 ) );
 
                 // Ensure discount is not empty or invalid
                 if ( $discount <= 0 ) {
@@ -1137,16 +1137,16 @@
                 error_log( 'Club Price Field Error: ' . $e->getMessage() );
             }
         }
-        add_action( 'woocommerce_product_options_pricing', 'gerendashaz_add_club_price_field' );
+        add_action( 'woocommerce_product_options_pricing', 'my_theme_add_club_price_field' );
     }
 
-    if ( ! function_exists( 'gerendashaz_save_club_price_field' ) ) {
+    if ( ! function_exists( 'my_theme_save_club_price_field' ) ) {
         /**
          * Saves the manual club price field when product is saved.
          *
          * @param int $post_id Product ID.
          */
-        function gerendashaz_save_club_price_field( $post_id ) {
+        function my_theme_save_club_price_field( $post_id ) {
             try {
                 if ( ! isset( $_POST['_club_price'] ) ) {
                     delete_post_meta( $post_id, '_club_price' );
@@ -1165,10 +1165,10 @@
                 error_log( 'Club Price Save Error: ' . $e->getMessage() );
             }
         }
-        add_action( 'woocommerce_process_product_meta', 'gerendashaz_save_club_price_field' );
+        add_action( 'woocommerce_process_product_meta', 'my_theme_save_club_price_field' );
     }
 
-    if ( ! function_exists( 'gerendashaz_display_club_price' ) ) {
+    if ( ! function_exists( 'my_theme_display_club_price' ) ) {
         /**
          * Display club price for all visitors (manual value or automatic discount).
          * Excludes sale products.
@@ -1177,7 +1177,7 @@
          * @param WC_Product $product WooCommerce product object.
          * @return string Modified price output with club price.
          */
-        function gerendashaz_display_club_price( $price, $product ) {
+        function my_theme_display_club_price( $price, $product ) {
             try {
                 if ( is_admin() ) {
                     return $price;
@@ -1206,7 +1206,7 @@
 
                         $save_html = '';
                         if ( is_product() ) {
-                            $savings_label = get_option( 'gerendashaz_savings_label', __( 'Savings', 'gerendashaz' ) );
+                            $savings_label = get_option( 'my_theme_savings_label', __( 'Savings', 'gerendashaz' ) );
                             $save_html  = '<span class="price__discount">';
                             $save_html .= '<span class="price-label">' . esc_html( $savings_label ) . ':</span> ';
                             $save_html .= wc_price( $amount_saved );
@@ -1228,7 +1228,7 @@
                 $manual_club_price = is_numeric( $manual_club_price ) ? floatval( $manual_club_price ) : 0;
 
                 // Discount percent
-                $discount_percent = floatval( get_option( 'gerendashaz_club_discount_amount', 0 ) );
+                $discount_percent = floatval( get_option( 'my_theme_club_discount_amount', 0 ) );
                 $discount_percent = $discount_percent > 0 ? $discount_percent : 0;
 
                 // If neither manual price nor discount is valid -> DO NOT DISPLAY CLUB PRICE
@@ -1249,7 +1249,7 @@
 
                 // Output HTML
                 $club_price_html = wc_price( $club_price );
-                $club_label      = get_option( 'gerendashaz_club_price_label', __( 'Club price', 'gerendashaz' ) );
+                $club_label      = get_option( 'my_theme_club_price_label', __( 'Club price', 'gerendashaz' ) );
 
                 $price_html .= '<span class="price__club"><span class="price-label">' . esc_html( $club_label ) . ':</span> <ins>' . $club_price_html . '</ins></span>';
 
@@ -1260,22 +1260,22 @@
                 return $price;
             }
         }
-        add_filter( 'woocommerce_get_price_html', 'gerendashaz_display_club_price', 20, 2 );
+        add_filter( 'woocommerce_get_price_html', 'my_theme_display_club_price', 20, 2 );
     }
 
-    if ( ! function_exists( 'gerendashaz_apply_club_price_in_cart' ) ) {
+    if ( ! function_exists( 'my_theme_apply_club_price_in_cart' ) ) {
         /**
          * Apply club price in cart for logged-in club members only.
          *
          * @param WC_Cart $cart WooCommerce cart object.
          */
-        function gerendashaz_apply_club_price_in_cart( $cart ) {
+        function my_theme_apply_club_price_in_cart( $cart ) {
             try {
                 if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
                 if ( ! is_user_logged_in() ) return;
 
                 $user_id = get_current_user_id();
-                if ( ! gerendashaz_is_club_member( $user_id ) ) return;
+                if ( ! my_theme_is_club_member( $user_id ) ) return;
 
                 foreach ( $cart->get_cart() as $cart_item ) {
 
@@ -1298,7 +1298,7 @@
                     $manual_club_price = is_numeric( $manual_club_price ) ? floatval( $manual_club_price ) : 0;
 
                     // Discount percent
-                    $discount_percent = floatval( get_option( 'gerendashaz_club_discount_amount', 0 ) );
+                    $discount_percent = floatval( get_option( 'my_theme_club_discount_amount', 0 ) );
                     $discount_percent = $discount_percent > 0 ? $discount_percent : 0;
 
                     // If neither manual nor discount is valid → no club price
@@ -1325,10 +1325,10 @@
                 error_log( 'Apply Club Price Error: ' . $e->getMessage() );
             }
         }
-        add_action( 'woocommerce_before_calculate_totals', 'gerendashaz_apply_club_price_in_cart' );
+        add_action( 'woocommerce_before_calculate_totals', 'my_theme_apply_club_price_in_cart' );
     }
 
-    if ( ! function_exists( 'gerendashaz_mini_cart_club_price_only' ) ) {
+    if ( ! function_exists( 'my_theme_mini_cart_club_price_only' ) ) {
         /**
          * Mini cart: show ONLY club price (with label) if user is a club member.
          *
@@ -1338,7 +1338,7 @@
          *
          * @return string Modified price HTML or original.
          */
-        function gerendashaz_mini_cart_club_price_only( $price_html, $cart_item, $cart_item_key ) {
+        function my_theme_mini_cart_club_price_only( $price_html, $cart_item, $cart_item_key ) {
             try {
                 // Must be logged in
                 if ( ! is_user_logged_in() ) {
@@ -1347,7 +1347,7 @@
 
                 // Must be club member
                 $user_id = get_current_user_id();
-                if ( ! gerendashaz_is_club_member( $user_id ) ) {
+                if ( ! my_theme_is_club_member( $user_id ) ) {
                     return $price_html;
                 }
 
@@ -1378,7 +1378,7 @@
                 $manual_club_price = is_numeric( $manual_club_price ) ? floatval( $manual_club_price ) : 0;
 
                 // Discount percent
-                $discount_percent = floatval( get_option( 'gerendashaz_club_discount_amount', 0 ) );
+                $discount_percent = floatval( get_option( 'my_theme_club_discount_amount', 0 ) );
                 $discount_percent = $discount_percent > 0 ? $discount_percent : 0;
 
                 // If neither manual nor discount → do not show club price
@@ -1406,7 +1406,7 @@
                 // --------------------------------------
 
                 $club_label = get_option(
-                    'gerendashaz_club_price_label',
+                    'my_theme_club_price_label',
                     __( 'Club price', 'gerendashaz' )
                 );
 
@@ -1422,16 +1422,16 @@
                 return $price_html;
             }
         }
-        add_filter( 'woocommerce_cart_item_price', 'gerendashaz_mini_cart_club_price_only', 10, 3 );
+        add_filter( 'woocommerce_cart_item_price', 'my_theme_mini_cart_club_price_only', 10, 3 );
     }
 
-    if ( ! function_exists( 'gerendashaz_show_club_progress_message' ) ) {
+    if ( ! function_exists( 'my_theme_show_club_progress_message' ) ) {
         /**
          * Display a message showing how much more the user needs to spend
          * to become a Club Member (threshold: 100 000 HUF), only if the product
          * has a club price or a club discount.
          */
-        function gerendashaz_show_club_progress_message() {
+        function my_theme_show_club_progress_message() {
             try {
                 // Only logged-in users have spending history
                 if ( ! is_user_logged_in() ) {
@@ -1455,7 +1455,7 @@
                 $manual_club_price = is_numeric( $manual_club_price ) ? floatval( $manual_club_price ) : 0;
 
                 // Check for club discount
-                $discount_percent = floatval( get_option( 'gerendashaz_club_discount_amount', 0 ) );
+                $discount_percent = floatval( get_option( 'my_theme_club_discount_amount', 0 ) );
                 $discount_percent = $discount_percent > 0 ? $discount_percent : 0;
 
                 // If neither manual nor discount → do not show club progress message
@@ -1500,7 +1500,7 @@
                 error_log( 'Club Progress Message Error: ' . $e->getMessage() );
             }
         }
-        add_action( 'woocommerce_after_add_to_cart_form', 'gerendashaz_show_club_progress_message', 10 );
+        add_action( 'woocommerce_after_add_to_cart_form', 'my_theme_show_club_progress_message', 10 );
     }
 
     // ============================================================
@@ -2049,7 +2049,57 @@
     }
 
     // ============================================================
-    // 15. AGE CONFIRMATION
+    // 15. CHECKOUT FIELDS MODIFICATIONS
+    // ============================================================
+
+    if ( ! function_exists( 'my_customize_country_locale' ) ) {
+        /**
+         * Modify WooCommerce country locale:
+         * - Force the "state" field to be required and visible.
+         * - Change the order of address fields.
+         *
+         * @param array $locale Country locale settings.
+         * @return array Modified locale settings.
+         */
+        function my_customize_country_locale( $locale ) {
+            foreach ( $locale as $country_code => $fields ) {
+
+                // Ensure state is required + visible
+                $locale[ $country_code ]['state'] = [
+                    'required' => true,
+                    'hidden'   => false,
+                    'priority' => 45, // Add priority to change order
+                ];
+
+                /**
+                 * Change the order of fields by controlling priority.
+                 * Lower number = earlier in the form.
+                 * Adjust these values as needed.
+                 */
+                if ( isset( $locale[ $country_code ]['postcode'] ) ) {
+                    $locale[ $country_code ]['postcode']['priority'] = 50;
+                }
+
+                if ( isset( $locale[ $country_code ]['city'] ) ) {
+                    $locale[ $country_code ]['city']['priority'] = 60;
+                }
+
+                if ( isset( $locale[ $country_code ]['address_1'] ) ) {
+                    $locale[ $country_code ]['address_1']['priority'] = 70;
+                }
+
+                if ( isset( $locale[ $country_code ]['address_2'] ) ) {
+                    $locale[ $country_code ]['address_2']['priority'] = 80;
+                }
+            }
+
+            return $locale;
+        }
+        add_filter( 'woocommerce_get_country_locale', 'my_customize_country_locale' );
+    }
+
+    // ============================================================
+    // 16. AGE CONFIRMATION
     // ============================================================
 
     /**
@@ -2102,7 +2152,67 @@
     }
 
     // ============================================================
-    // 16. MARKETING NEWSLETTER OPT-IN
+    // 17. HONEYPOT
+    // ============================================================
+
+    if ( ! function_exists( 'my_plugin_register_honeypot_field' ) ) {
+        /**
+         * Register a hidden honeypot checkout field to block bots.
+         */
+        function my_plugin_register_honeypot_field() {
+
+            // Only proceed if WooCommerce provides the registration function.
+            if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) ) {
+                if ( function_exists( 'wc_get_logger' ) ) {
+                    wc_get_logger()->debug(
+                        'Honeypot field not registered — missing woocommerce_register_additional_checkout_field()',
+                        array( 'source' => 'gerendashaz' )
+                    );
+                }
+                return;
+            }
+
+            try {
+                woocommerce_register_additional_checkout_field( array(
+                    'id'            => 'my_plugin/honeypot',
+                    'label'         => esc_html__( 'Leave this field empty', 'gerendashaz' ),
+                    'location'      => 'order',
+                    'type'          => 'text',
+                    'required'      => false,
+                    'error_message' => esc_html__( 'Spam detected. Please try again.', 'gerendashaz' ),
+                    'validate_callback' => function( $value ) {
+                        if ( ! empty( $value ) ) {
+                            return new WP_Error( 
+                                'honeypot_filled', 
+                                __('Spam detected. Please try again.', 'gerendashaz') 
+                            );
+                        }
+                    },
+                ) );
+            } catch ( Exception $e ) {
+                if ( function_exists( 'wc_get_logger' ) ) {
+                    wc_get_logger()->error(
+                        'Failed to register honeypot field: ' . $e->getMessage(),
+                        array( 'source' => 'gerendashaz' )
+                    );
+                }
+            }
+        }
+        add_action( 'woocommerce_init', 'my_plugin_register_honeypot_field' );
+    }
+
+    if ( ! function_exists( 'my_plugin_hide_honeypot_field_css' ) ) {
+        /**
+         * Hide the honeypot field from human users using CSS.
+         */
+        function my_plugin_hide_honeypot_field_css() {
+            echo '<style>.wc-block-components-address-form__my_plugin-honeypot { display:none !important; }</style>';
+        }
+        add_action( 'wp_head', 'my_plugin_hide_honeypot_field_css' );
+    }
+
+    // ============================================================
+    // 18. MARKETING NEWSLETTER OPT-IN
     // ============================================================
 
     if ( ! function_exists( 'my_plugin_register_marketing_optin_field' ) ) {
@@ -2139,6 +2249,17 @@
     }
 
     if ( ! function_exists( 'my_plugin_handle_newsletter_subscription' ) ) {
+        /**
+         * Handle newsletter subscription after WooCommerce checkout.
+         *
+         * Triggered on the `woocommerce_thankyou` hook. Validates the order,
+         * checks whether the customer opted into marketing, and if so, attempts
+         * to subscribe them to Mailchimp using the configured API credentials.
+         *
+         * @param int $order_id WooCommerce order ID.
+         *
+         * @return void
+         */
         function my_plugin_handle_newsletter_subscription( $order_id ) {
 
             // Validate order ID
@@ -2225,6 +2346,5 @@
                 );
             }
         }
-
         add_action( 'woocommerce_thankyou', 'my_plugin_handle_newsletter_subscription', 20, 1 );
     }

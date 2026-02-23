@@ -24,7 +24,7 @@
         <?php if ($image_id) : ?>
             <div class="card__header">
                 <div class="card__image-wrapper">
-                    <?php echo wp_get_attachment_image($image_id, 'medium_large', false, ['class' => 'card__image', 'alt' => esc_attr($alt_text), 'loading' => 'lazy']); ?>
+                    <?php echo wp_get_attachment_image($image_id, 'medium', false, ['class' => 'card__image', 'alt' => esc_attr($alt_text), 'loading' => 'lazy']); ?>
                 </div>
             </div>
         <?php elseif ( defined( 'PLACEHOLDER_IMG_SRC' ) && PLACEHOLDER_IMG_SRC ) : ?>
@@ -36,7 +36,7 @@
         <?php endif; ?>
 
         <div class="card__content">
-            <h3 class="card__title"><?php the_title(); ?></h3>
+            <h2 class="card__title"><?php the_title(); ?></h2>
 
             <div class="card__meta">
                 <?php if (!empty($categories) && is_array($categories)) : ?>

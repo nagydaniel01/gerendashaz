@@ -3,14 +3,14 @@
         exit; // Exit if accessed directly
     }
     
-    if ( ! function_exists( 'gerendashaz_register_attribute_rewrites' ) ) {
+    if ( ! function_exists( 'my_theme_register_attribute_rewrites' ) ) {
         /**
          * Registers rewrite rules for all WooCommerce product attribute base slugs.
          * This allows URLs like /boraszat/ to be recognized by WordPress.
          *
          * @return void
          */
-        function gerendashaz_register_attribute_rewrites() {
+        function my_theme_register_attribute_rewrites() {
             if ( ! class_exists( 'WooCommerce' ) ) {
                 return;
             }
@@ -26,27 +26,27 @@
                     $base_slug = sanitize_title( $attribute->attribute_name ); // e.g., boraszat
                     add_rewrite_rule(
                         "^{$base_slug}/?$",
-                        'index.php?gerendashaz_product_attribute=' . $base_slug,
+                        'index.php?my_theme_product_attribute=' . $base_slug,
                         'top'
                     );
                 }
             }
         }
-        add_action( 'init', 'gerendashaz_register_attribute_rewrites' );
+        add_action( 'init', 'my_theme_register_attribute_rewrites' );
     }
 
-    if ( ! function_exists( 'gerendashaz_register_attribute_query_var' ) ) {
+    if ( ! function_exists( 'my_theme_register_attribute_query_var' ) ) {
         /**
          * Registers a query variable so WordPress can recognize custom attribute requests.
          *
          * @param array $vars Existing query variables.
          * @return array Modified query variables.
          */
-        function gerendashaz_register_attribute_query_var( $vars ) {
-            $vars[] = 'gerendashaz_product_attribute';
+        function my_theme_register_attribute_query_var( $vars ) {
+            $vars[] = 'my_theme_product_attribute';
             return $vars;
         }
-        add_filter( 'query_vars', 'gerendashaz_register_attribute_query_var' );
+        add_filter( 'query_vars', 'my_theme_register_attribute_query_var' );
     }
 
     if ( ! function_exists('product_attribute_base_template_redirect') ) {
@@ -61,7 +61,7 @@
         function product_attribute_base_template_redirect() {
             $request_uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
-            $custom_attr = get_query_var('gerendashaz_product_attribute');
+            $custom_attr = get_query_var('my_theme_product_attribute');
             if ( ! $custom_attr ) {
                 return;
             }

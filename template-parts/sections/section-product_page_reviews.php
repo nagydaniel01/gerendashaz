@@ -5,8 +5,12 @@ if ( ! $product ) return;
 
 // Only show reviews if there are reviews or comments are open
 if ( $product->get_review_count() > 0 || comments_open() ) : ?>
-    <section class="section section--product-reviews">
-        <div class="container">
+    <?php do_action('theme_section_open', [
+        'classes' => 'section section--product-reviews',
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+
             <h2 class="woocommerce-Reviews-title">
                 <?php
                 $count = $product->get_review_count();
@@ -22,6 +26,8 @@ if ( $product->get_review_count() > 0 || comments_open() ) : ?>
                 ?>
             </h2>
             <?php comments_template(); ?>
-        </div>
-    </section>
+
+        <?php do_action('theme_section_container_close'); ?>
+        
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

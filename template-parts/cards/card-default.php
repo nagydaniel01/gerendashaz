@@ -18,81 +18,83 @@
         $categories = [];
     }
 
-    $extra_classes = '';
+    $classes = 'card';
     if ($post_type) {
-        $extra_classes = ' card--'.$post_type;
+        $classes .= ' card--' . $post_type;
     }
 ?>
 
-<article id="<?php echo esc_attr($post_id); ?>" class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
-    <a href="<?php the_permalink(); ?>" class="card__link">
-        <?php if ($image_id) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <?php echo wp_get_attachment_image($image_id, 'medium_large', false, ['class' => 'card__image', 'alt' => esc_attr($alt_text), 'loading' => 'lazy']); ?>
-                </div>
-            </div>
-        <?php elseif ( defined( 'PLACEHOLDER_IMG_SRC' ) && PLACEHOLDER_IMG_SRC ) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <img width="150" height="150" src="<?php echo esc_url( PLACEHOLDER_IMG_SRC ); ?>" alt="" class="card__image card__image--placeholder" loading="lazy">
-                </div>
-            </div>
-        <?php endif; ?>
+<?php do_action('theme_card_open', [
+    'post_id' => $post_id,
+    'classes' => $classes
+]); ?>
 
-        <div class="card__content">
-            <h3 class="card__title"><?php the_title(); ?></h3>
-            
-            <div class="card__lead"><?php the_excerpt(); ?></div>
+    <?php do_action('theme_card_link_open', ['post_id' => $post_id]); ?>
 
-            <div class="card__meta">
-                <?php if (!empty($categories) && is_array($categories)) : ?>
-                    <span class="card__categories">
-                        <?php
-                            $primary_category = '';
+        <?php
+        do_action('theme_card_header', [
+            'image_id' => $image_id,
+            'alt_text' => $alt_text
+        ]);
+        ?>
 
-                            if (function_exists('get_rank_math_primary_term_name')) {
-                                $primary_category = get_rank_math_primary_term_name(null, 'category');
-                            }
+        <?php do_action('theme_card_content_open'); ?>
 
-                            if (empty($primary_category) && !empty($categories[0]) && isset($categories[0]->name)) {
-                                $primary_category = $categories[0]->name;
-                            }
-                        ?>
+            <?php
+            do_action('theme_card_title', [
+                'card_title' => $title
+            ]);
 
-                        <?php if (!empty($primary_category)) : ?>
-                            <span class="card__category"><?php echo esc_html($primary_category); ?></span>
-                        <?php endif; ?>
-                    </span>
-                <?php endif; ?>
+            do_action('theme_card_description', [
+                'card_description' => get_the_excerpt()
+            ]);
 
-                <time datetime="<?php echo esc_html(get_the_date('c')); ?>" class="card__date"><?php echo get_the_date(); ?></time>
-            </div>
+            do_action('theme_card_meta', [
+                'post_id' => $post_id,
+                'show_category' => true,
+                'show_date'     => true,
+            ]);
+            ?>
 
             <span class="card__button">
-                <svg class="icon icon-arrow-right"><use xlink:href="#icon-arrow-right"></use></svg>
+                <svg class="icon icon-arrow-right">
+                    <use xlink:href="#icon-arrow-right"></use>
+                </svg>
             </span>
-        </div>
-    </a>
-    <?php if ( ! is_user_logged_in() ) : ?>
+
+        <?php do_action('theme_card_content_close'); ?>
+
+    <?php do_action('theme_card_link_close'); ?>
+
+    <?php
+    // Bookmark button stays custom (since it’s logic-heavy)
+    $current_user_id = get_current_user_id();
+
+    if (!is_user_logged_in()) :
+    ?>
         <a class="card__bookmark" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
             <svg class="icon icon-bookmark-empty">
                 <use xlink:href="#icon-bookmark-empty"></use>
             </svg>
-            <span class="visually-hidden"><?php echo esc_html__('Add to bookmarks', 'gerendashaz'); ?></span>
+            <span class="visually-hidden">
+                <?php echo esc_html__('Add to bookmarks', 'gerendashaz'); ?>
+            </span>
         </a>
-    <?php else : ?>
-        <?php
-            $bookmark_ids  = get_field('user_bookmarks', 'user_'.$current_user_id) ?: [];
-            $is_bookmarked = in_array( get_the_ID(), $bookmark_ids, true );
-            $bookmark_icon = $is_bookmarked ? 'bookmark' : 'bookmark-empty';
-            $bookmark_text = $is_bookmarked ? __('Remove form bookmarks', 'gerendashaz') : __('Add to bookmarks', 'gerendashaz');
-        ?>
-        <a id="btn-bookmark" class="card__bookmark" href="#" data-post-id="<?php echo esc_attr($post_id); ?>" data-bookmarked="<?php echo esc_attr($is_bookmarked ? 'true' : 'false'); ?>">
+    <?php
+    else :
+        $bookmark_ids  = get_field('user_bookmarks', 'user_'.$current_user_id) ?: [];
+        $is_bookmarked = in_array($post_id, $bookmark_ids, true);
+        $bookmark_icon = $is_bookmarked ? 'bookmark' : 'bookmark-empty';
+        $bookmark_text = $is_bookmarked
+            ? __('Remove from bookmarks', 'gerendashaz')
+            : __('Add to bookmarks', 'gerendashaz');
+    ?>
+        <a class="card__bookmark" href="#" data-post-id="<?php echo esc_attr($post_id); ?>" data-bookmarked="<?php echo esc_attr($is_bookmarked ? 'true' : 'false'); ?>">
             <svg class="icon icon-<?php echo esc_attr($bookmark_icon); ?>">
                 <use xlink:href="#icon-<?php echo esc_attr($bookmark_icon); ?>"></use>
             </svg>
             <span class="visually-hidden"><?php echo esc_html($bookmark_text); ?></span>
         </a>
     <?php endif; ?>
-</article>
+
+<?php do_action('theme_card_close'); ?>

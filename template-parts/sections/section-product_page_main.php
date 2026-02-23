@@ -2,10 +2,14 @@
 global $product;
 
 if ( ! $product ) return;
+
+do_action( 'theme_section_open', [
+    'classes' => 'section section--product-main',
+] );
 ?>
 
-<section class="section section--product-main">
-    <div class="container">
+    <?php do_action( 'theme_section_container_open' ); ?>
+
         <div class="section__inner">
             <!-- Left column: Product gallery -->
             <div class="gallery entry-gallery">
@@ -99,5 +103,7 @@ if ( ! $product ) return;
                 ?>
             </div>
         </div>
-    </div>
-</section>
+
+    <?php do_action( 'theme_section_container_close' ); ?>
+
+<?php do_action( 'theme_section_close' ); ?>

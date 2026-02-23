@@ -6,9 +6,7 @@
     /**
      * Add "Enable Mega Menu" checkbox to WordPress menu items in admin.
      */
-
     if ( ! function_exists( 'add_mega_menu_checkbox_to_menu_item' ) ) {
-
         /**
          * Display a checkbox for "Enable Mega Menu" on each menu item in admin.
          *
@@ -32,13 +30,10 @@
             </p>
             <?php
         }
-
         add_action( 'wp_nav_menu_item_custom_fields', 'add_mega_menu_checkbox_to_menu_item', 10, 4 );
     }
 
-
     if ( ! function_exists( 'save_mega_menu_checkbox_value' ) ) {
-
         /**
          * Save the value of the "Enable Mega Menu" checkbox when updating a menu item.
          *

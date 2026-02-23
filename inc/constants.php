@@ -133,6 +133,22 @@
         define( 'THANK_YOU_PAGE_ID', ! empty( $page_thank_you ) ? $page_thank_you[0]->ID : 0 );
     }
 
+    // Define WooCommerce Page IDs Constants
+    if ( class_exists( 'WooCommerce' ) ) {
+        if ( ! defined( 'SHOP_PAGE_ID' ) ) {
+            define( 'SHOP_PAGE_ID', wc_get_page_id( 'shop' ) );
+        }
+        if ( ! defined( 'CART_PAGE_ID' ) ) {
+            define( 'CART_PAGE_ID', wc_get_page_id( 'cart' ) );
+        }
+        if ( ! defined( 'CHECKOUT_PAGE_ID' ) ) {
+            define( 'CHECKOUT_PAGE_ID', wc_get_page_id( 'checkout' ) );
+        }
+        if ( ! defined( 'MY_ACCOUNT_PAGE_ID' ) ) {
+            define( 'MY_ACCOUNT_PAGE_ID', wc_get_page_id( 'myaccount' ) );
+        }
+    }
+
     // Define ACF Fields Constants
     if ( function_exists( 'get_field' ) ) {
         $under_construction_mode = get_field( 'under_construction_mode', 'option' ) ?? false;
@@ -161,22 +177,6 @@
         }
     }
 
-    // Define WooCommerce Page IDs Constants
-    if ( class_exists( 'WooCommerce' ) ) {
-        if ( ! defined( 'SHOP_PAGE_ID' ) ) {
-            define( 'SHOP_PAGE_ID', wc_get_page_id( 'shop' ) );
-        }
-        if ( ! defined( 'CART_PAGE_ID' ) ) {
-            define( 'CART_PAGE_ID', wc_get_page_id( 'cart' ) );
-        }
-        if ( ! defined( 'CHECKOUT_PAGE_ID' ) ) {
-            define( 'CHECKOUT_PAGE_ID', wc_get_page_id( 'checkout' ) );
-        }
-        if ( ! defined( 'MY_ACCOUNT_PAGE_ID' ) ) {
-            define( 'MY_ACCOUNT_PAGE_ID', wc_get_page_id( 'myaccount' ) );
-        }
-    }
-
     // Define Google API Constants
     if ( ! defined( 'GOOGLE_MAPS_API_KEY' ) ) {
         define( 'GOOGLE_MAPS_API_KEY', 'AIzaSyCHo9YVGjPyHL1h8TNyHxkesfGzCx0GdLg' );
@@ -193,9 +193,9 @@
 
     // Define Facebook Pixel and Google Tag Manager Constants
     if ( ! defined( 'GTM_ID' ) ) {
-        define( 'GTM_ID', 'GTM-NNHDJK5K' );
+        define( 'GTM_ID', '' );
     }
 
     if ( ! defined( 'FB_PIXEL_ID' ) ) {
-        define( 'FB_PIXEL_ID', '1178515017580965' );
+        define( 'FB_PIXEL_ID', '' );
     }

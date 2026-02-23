@@ -92,7 +92,7 @@
                 return;
             }
 
-            if ( ! current_user_can( 'manage_options' ) ) {
+            if ( ! current_user_can( 'edit_posts' ) ) {
                 return;
             }
 
@@ -278,7 +278,6 @@
         }
     }
 
-    // Populate ACF select field options with Gravity Forms forms
     if ( ! function_exists( 'acf_populate_gform_ids' ) ) {
         /**
          * Populate ACF select field options with available Gravity Forms forms.
@@ -307,76 +306,34 @@
         add_filter( 'acf/load_field/name=gform', 'acf_populate_gform_ids' );
     }
 
-    if ( ! function_exists( 'acf_load_food_pairing_tip_checkboxes' ) ) {
+    if ( ! function_exists( 'get_acf_image_url' ) ) {
         /**
-         * Populate ACF 'product_food_pairing_tips' checkbox field with items from
-         * the 'food_pairing_tip_items' repeater field (on Options page).
+         * Get image URL from an ACF image field.
          *
-         * @param array $field The ACF field array.
-         * @return array Modified field with dynamic choices.
+         * Supports return formats: ID, array, or URL string.
+         *
+         * @param mixed  $image ACF image field value.
+         * @param string $size  Image size.
+         * @return string|null  Image URL or null if invalid.
          */
-        function acf_load_food_pairing_tip_checkboxes( $field ) {
+        function get_acf_image_url( $image, $size = 'full' ) {
 
-            // Reset choices
-            $field['choices'] = array();
-
-            // Check if repeater has rows of data (replace 'option' if not on Options page)
-            if ( have_rows( 'food_pairing_tip_items', 'option' ) ) {
-
-                while ( have_rows( 'food_pairing_tip_items', 'option' ) ) {
-                    the_row();
-
-                    // Get subfield text
-                    $text = get_sub_field( 'food_pairing_tip_text' );
-
-                    if ( $text ) {
-                        // Use sanitized text as value and original text as label
-                        $field['choices'][ sanitize_title( $text ) ] = $text;
-                    }
-                }
+            if (!$image) {
+                return null;
             }
 
-            return $field;
-        }
-        add_filter( 'acf/load_field/name=product_food_pairing_tips', 'acf_load_food_pairing_tip_checkboxes' );
-    }
-
-    if ( ! function_exists( 'acf_load_icon_checkboxes' ) ) {
-        /**
-         * Populate ACF 'product_page_icons' and 'product_icons' checkbox fields with
-         * static choices and items from the 'icon_items' repeater field (on Options page).
-         *
-         * @param array $field The ACF field array.
-         * @return array Modified field with dynamic and static choices.
-         */
-        function acf_load_icon_checkboxes( $field ) {
-
-            // Reset choices
-            $field['choices'] = array();
-
-            // Add fixed/static choices
-            $field['choices']['units_sold_message'] = __( 'Units Sold', 'gerendashaz' );
-            $field['choices']['free_shipping_limit_message'] = __( 'Free Shipping Limit', 'gerendashaz' );
-            $field['choices']['estimated_delivery_message'] = __( 'Estimated Delivery', 'gerendashaz' );
-
-            // Check if repeater has rows of data (replace 'option' if not on Options page)
-            if ( have_rows( 'icon_items', 'option' ) ) {
-
-                while ( have_rows( 'icon_items', 'option' ) ) {
-                    the_row();
-
-                    // Get subfield text
-                    $text = get_sub_field( 'icon_text' );
-
-                    if ( $text ) {
-                        // Use sanitized text as value and original text as label
-                        $field['choices'][ sanitize_title( $text ) ] = $text;
-                    }
-                }
+            if ( is_numeric( $image ) ) {
+                return wp_get_attachment_image_url( (int) $image, $size ) ?: null;
             }
 
-            return $field;
+            if ( is_array( $image ) && ! empty( $image['url'] ) ) {
+                return esc_url_raw( $image['url'] );
+            }
+
+            if ( is_string( $image ) && filter_var( $image, FILTER_VALIDATE_URL ) ) {
+                return esc_url_raw( $image );
+            }
+
+            return null;
         }
-        add_filter( 'acf/load_field/name=product_page_icons', 'acf_load_icon_checkboxes' );
-        add_filter( 'acf/load_field/name=product_icons', 'acf_load_icon_checkboxes' );
     }

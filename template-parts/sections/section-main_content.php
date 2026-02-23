@@ -10,32 +10,32 @@
     $section_lead        = $section['main_content_section_lead'] ?? '';
 ?>
 
-<section id="<?php echo esc_attr($section_slug); ?>" class="section section--main_content section--single<?php echo esc_attr($section_classes); ?>">
-    <div class="container">
-        <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-            <div class="section__header">
-                <?php if ( function_exists('rank_math_the_breadcrumbs') ) rank_math_the_breadcrumbs(); ?>
+<?php do_action('theme_section_open', [
+    'id'      => $section_slug,
+    'classes' => 'section section--main_content section--single' . esc_attr($section_classes),
+]); ?>
 
-                <?php if ($section_hide_title !== true) : ?>
-                    <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                <?php endif; ?>
-                <?php if (!empty($section_lead)) : ?>
-                    <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                <?php endif; ?>
-                <?php if (has_post_thumbnail()) : ?>
-                    <?php
-                        $thumbnail_id = get_post_thumbnail_id();
-                        $alt_text     = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true) ?: get_the_title();
-                    ?>
-                    <?php echo get_the_post_thumbnail( get_the_ID(), 'large', ['class' => 'section__image', 'alt'   => esc_attr($alt_text)] ); ?>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+    <?php do_action('theme_section_container_open'); ?>
+
+        <?php 
+        // Section header via hook
+        do_action('theme_section_header', [
+            'title'            => $section_title,
+            'hide_title'       => $section_hide_title,
+            'lead'             => $section_lead,
+            'show_breadcrumbs' => true,
+            'show_image'       => true,
+        ]); 
+        ?>
 
         <?php if (get_the_content()) : ?>
-            <div class="section__content">
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php echo apply_filters('the_content', get_the_content()); ?>
-            </div>
+            
+            <?php do_action('theme_section_content_close'); ?>
         <?php endif; ?>
-    </div>
-</section>
+
+    <?php do_action('theme_section_container_close'); ?>
+
+<?php do_action('theme_section_close'); ?>

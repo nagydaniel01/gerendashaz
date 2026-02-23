@@ -45,20 +45,21 @@
 ?>
 
 <?php if ($related_posts->have_posts()) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--related_posts<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-            
-            <div class="section__content">
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--related_posts' . esc_attr($section_classes),
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); ?>
+
+            <?php do_action('theme_section_content_open'); ?>
+
                 <div class="slider slider--related" id="related-posts-slider">
                     <div class="slider__list">
                         <?php while ( $related_posts->have_posts() ) : $related_posts->the_post(); ?>
@@ -83,7 +84,10 @@
                     </div>
                     <div class="slider__controls"></div>
                 </div>
-            </div>
-        </div>
-    </section>
+                
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

@@ -7,10 +7,16 @@ if ( ! $product ) return;
 $upsells = $product->get_upsell_ids();
 
 if ( ! empty( $upsells ) ) : ?>
-    <section class="section section--product-upsells">
-        <div class="container">
+    <?php do_action('theme_section_open', [
+        'classes' => 'section section--product-upsells',
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+
             <h2><?php echo apply_filters( 'woocommerce_upsells_products_heading', __( 'You may also like&hellip;', 'woocommerce' ) ); ?></h2>
             <?php woocommerce_upsell_display( 4, 4 ); ?>
-        </div>
-    </section>
+
+        <?php do_action('theme_section_container_close'); ?>
+        
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

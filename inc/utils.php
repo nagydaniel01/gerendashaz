@@ -629,10 +629,6 @@
             return $returnTag ? "<a href=\"{$url}\" target=\"_blank\" rel=\"noopener noreferrer\">{$address}</a>" : $url;
         }
     }
-    
-    // ---------------------------------------------
-    // Custom GERENDASHAZ function
-    // ---------------------------------------------
 
     if ( ! function_exists( 'has_acf_section' ) ) {
         /**
@@ -691,93 +687,6 @@
             return $classes;
         }
         // $section_classes = build_section_classes($section, 'post_query');
-    }
-
-    if ( ! function_exists( 'fix_site_name_text' ) ) {
-        /**
-         * Normalize ANY variation of the site name in content
-         * - Replaces text inside <a> links but keeps href
-         * - Skips emails and URLs
-         * - Handles messy spacing and capitalization
-         * - Prevents infinite recursion when called via ACF
-         */
-        function fix_site_name_text( $content ) {
-            static $running = false;
-            if ( $running ) {
-                return $content; // prevent recursion
-            }
-            $running = true;
-
-            if ( ! is_string( $content ) ) {
-                $running = false;
-                return $content;
-            }
-
-            // Get the site name dynamically
-            $site_name = get_bloginfo('name') ?: get_field('site_name', 'option') ?: '';
-
-            if ( empty( $site_name ) ) {
-                $running = false;
-                return $content;
-            }
-
-            // Escape regex special characters
-            $escaped_site_name = preg_quote( $site_name, '/' );
-
-            // Allow messy spacing between words
-            $pattern_site_name = preg_replace('/\s+/', '\s+', $escaped_site_name);
-
-            // Regex: links, emails, URLs, or variations of site name
-            $pattern = '/
-                (<a\s[^>]*>)(.*?)(<\/a>)      # 1. links
-                |
-                ([\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}) # 2. emails
-                |
-                ((?:https?:\/\/|www\.)[^\s<]+)  # 3. URLs
-                |
-                (' . $pattern_site_name . ')      # 4. messy site name
-            /iusx';
-
-            $content = preg_replace_callback(
-                $pattern,
-                function ( $matches ) use ( $site_name ) {
-                    // Link → replace only the text inside <a>
-                    if ( ! empty( $matches[1] ) && isset( $matches[2] ) ) {
-                        $link_text = preg_replace(
-                            '/\b' . preg_quote($site_name, '/') . '\b/iu',
-                            $site_name,
-                            $matches[2]
-                        );
-                        return $matches[1] . $link_text . $matches[3];
-                    }
-                    // Email → skip
-                    if ( ! empty( $matches[4] ) ) {
-                        return $matches[4];
-                    }
-                    // URL → skip
-                    if ( ! empty( $matches[5] ) ) {
-                        return $matches[5];
-                    }
-                    // Plain text → replace
-                    if ( ! empty( $matches[6] ) ) {
-                        return $site_name;
-                    }
-                    return $matches[0];
-                },
-                $content
-            );
-
-            $running = false;
-            return $content;
-        }
-
-        // Apply to WordPress filters
-        add_filter( 'the_content', 'fix_site_name_text', 20 );
-        add_filter( 'get_the_excerpt', 'fix_site_name_text', 20 );
-        add_filter( 'term_description', 'fix_site_name_text', 20 );
-        add_filter( 'widget_text', 'fix_site_name_text', 20 );
-        add_filter( 'acf/format_value', 'fix_site_name_text', 20 );
-        add_filter( 'acf/format_value/type=wysiwyg', 'fix_site_name_text', 20 );
     }
 
     if ( ! function_exists( 'get_opening_hours' ) ) {

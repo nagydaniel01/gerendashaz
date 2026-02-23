@@ -1,4 +1,8 @@
 <?php
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+    }
+    
     // PHPDoc-style comments (docblocks)
     if ( ! function_exists( 'include_files_recursively' ) ) {
         /**

@@ -22,20 +22,21 @@
 ?>
 
 <?php if (!empty($download_items)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--download<?php echo esc_attr($section_classes); ?>">
-        <div class="container">
-            <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-                <div class="section__header">
-                    <?php if ($section_hide_title !== true) : ?>
-                        <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                    <?php endif; ?>
-                    <?php if (!empty($section_lead)) : ?>
-                        <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--download' . esc_attr($section_classes),
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+
+            <?php do_action('theme_section_header', [
+                'title'      => $section_title,
+                'hide_title' => $section_hide_title,
+                'lead'       => $section_lead,
+            ]); ?>
             
-            <div class="section__content">
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php foreach ($download_items as $key => $item) : 
                     $title       = $item['download_title'] ?? '';
                     $description = $item['download_description'] ?? '';
@@ -84,7 +85,10 @@
                 </div>
                 
                 <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
+            
+            <?php do_action('theme_section_content_close'); ?>
+            
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

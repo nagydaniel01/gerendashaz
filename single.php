@@ -102,6 +102,9 @@
     ?>
 
     <main class="page page--single page--single-<?php echo esc_attr( $post_type ); ?>">
+
+        <?php if (!has_acf_section()) : ?>
+
         <section class="section section--single section--single-<?php echo esc_attr( $post_type ); ?>">
             <div class="container container--narrow">
                 <header class="section__header">
@@ -177,12 +180,12 @@
                     <?php if ( has_post_thumbnail() ) : ?>
                         <div class="section__image-wrapper">
                             <?php
-                                $thumbnail_id = get_post_thumbnail_id( get_the_ID() );
-                                $alt_text = get_post_meta( $thumbnail_id, '_wp_attachment_image_alt', true );
+                                $thumbnail_id = get_post_thumbnail_id();
+                                $alt_text     = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true) ?: get_the_title();
 
-                                the_post_thumbnail('full', [
+                                the_post_thumbnail('large', [
                                     'class'         => 'section__image',
-                                    'alt'           => $alt_text ?: get_the_title(),
+                                    'alt'           => esc_attr($alt_text),
                                     'loading'       => 'eager',
                                     'fetchpriority' => 'high',
                                     'decoding'      => 'async'
@@ -393,6 +396,13 @@
                 ?>
             </div>
         </section>
+
+        <?php else : ?>
+    
+            <?php get_template_part('template-parts/flexibile-elements'); ?>
+    
+        <?php endif; ?>
+        
     </main>
 
     <?php endwhile; ?>

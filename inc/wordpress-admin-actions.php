@@ -2,6 +2,92 @@
     if ( ! defined( 'ABSPATH' ) ) {
         exit; // Exit if accessed directly
     }
+
+    // ============================================================
+    // ADD ALL SETTINGS MENU
+    // ============================================================
+
+    if ( ! function_exists( 'add_all_settings_menu' ) ) {
+        /**
+         * Adds a link to "All Settings" in the WordPress admin menu (for administrators only).
+         *
+         * @return void
+         */
+        function add_all_settings_menu() {
+            if ( is_admin() && current_user_can('administrator') ) {
+                add_options_page( 
+                    __('All Settings'), 
+                    __('All Settings'), 
+                    'administrator', 
+                    'options.php' 
+                );
+            }
+        }
+        add_action( 'admin_menu', 'add_all_settings_menu' );
+    }
+
+    if ( ! function_exists( 'custom_restrict_options_admin_access' ) ) {
+        /**
+         * Restricts access to certain admin settings pages for non-primary administrators.
+         *
+         * @return void
+         */
+        function custom_restrict_options_admin_access() {
+            $user = wp_get_current_user();
+
+            if ( in_array('administrator', (array) $user->roles, true) && $user->ID !== 1 ) {
+                // Remove menu items
+                add_action( 'admin_menu', 'custom_remove_options_admin_menus', 999 );
+
+                // Block access to specific admin pages
+                add_action( 'admin_enqueue_scripts', 'custom_block_options_admin_pages' );
+            }
+        }
+        add_action( 'init', 'custom_restrict_options_admin_access' );
+    }
+
+    if ( ! function_exists( 'custom_remove_options_admin_menus' ) ) {
+        /**
+         * Removes specific admin menus for secondary administrators.
+         *
+         * @return void
+         */
+        function custom_remove_options_admin_menus() {
+            $menus_to_remove = [
+                //'options-general.php', // Settings menu
+            ];
+    
+            foreach ($menus_to_remove as $menu) {
+                remove_menu_page($menu);
+            }
+    
+            $submenus_to_remove = [
+                ['options-general.php', 'options.php'], // "All Settings"
+            ];
+    
+            foreach ($submenus_to_remove as $submenu) {
+                remove_submenu_page($submenu[0], $submenu[1]);
+            }
+        }
+    }
+    
+    if ( ! function_exists( 'custom_block_options_admin_pages' ) ) {
+        /**
+         * Blocks direct access to restricted admin pages for secondary administrators.
+         *
+         * @param string $hook The current admin page hook.
+         * @return void
+         */
+        function custom_block_options_admin_pages( $hook ) {
+            $restricted_hooks = [
+                'options.php', // Block direct access to "All Settings"
+            ];
+    
+            if ( in_array($hook, $restricted_hooks, true) ) {
+                wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
+            }
+        }
+    }
     
     // ============================================================
     // ADMIN PAGE
@@ -284,6 +370,48 @@
     }
 
     // ============================================================
+    // APPLY AUTHOR FILTER TO ADMIN QUERY
+    // ============================================================
+
+    if ( ! function_exists( 'add_author_filter_dropdown' ) ) {
+        /**
+         * Adds an author filter dropdown to the admin post list.
+         *
+         * @return void
+         */
+        function add_author_filter_dropdown() {
+            global $typenow;
+
+            if (post_type_supports($typenow, 'author')) { // Only show if post type supports 'author'
+                $selected_author = isset($_GET['author']) ? intval($_GET['author']) : 0;
+
+                $authors = get_users(array(
+                    //'who'                   => 'authors',
+                    'capability'            => array('edit_posts'),
+                    'has_published_posts'   => true,
+                    'orderby'               => 'display_name',
+                    'order'                 => 'ASC',
+                ));
+
+                if (!empty($authors)) {
+                    echo '<select name="author" class="postform">';
+                    echo '<option value="">' . esc_html__('All authors', 'gerendashaz') . '</option>';
+                    foreach ($authors as $author) {
+                        printf(
+                            '<option value="%1$s"%2$s>%3$s</option>',
+                            esc_attr($author->ID),
+                            selected($selected_author, $author->ID, false),
+                            esc_html($author->display_name)
+                        );
+                    }
+                    echo '</select>';
+                }
+            }
+        }
+        add_action( 'restrict_manage_posts', 'add_author_filter_dropdown' );
+    }
+
+    // ============================================================
     // APPLY ON SALE FILTER TO ADMIN QUERY
     // ============================================================
 
@@ -350,48 +478,6 @@
             }
         }
         add_action( 'pre_get_posts', 'filter_products_by_sale_status' );
-    }
-
-    // ============================================================
-    // APPLY AUTHOR FILTER TO ADMIN QUERY
-    // ============================================================
-
-    if ( ! function_exists( 'add_author_filter_dropdown' ) ) {
-        /**
-         * Adds an author filter dropdown to the admin post list.
-         *
-         * @return void
-         */
-        function add_author_filter_dropdown() {
-            global $typenow;
-
-            if (post_type_supports($typenow, 'author')) { // Only show if post type supports 'author'
-                $selected_author = isset($_GET['author']) ? intval($_GET['author']) : 0;
-
-                $authors = get_users(array(
-                    //'who'                   => 'authors',
-                    'capability'            => array('edit_posts'),
-                    'has_published_posts'   => true,
-                    'orderby'               => 'display_name',
-                    'order'                 => 'ASC',
-                ));
-
-                if (!empty($authors)) {
-                    echo '<select name="author" class="postform">';
-                    echo '<option value="">' . esc_html__('All authors', 'gerendashaz') . '</option>';
-                    foreach ($authors as $author) {
-                        printf(
-                            '<option value="%1$s"%2$s>%3$s</option>',
-                            esc_attr($author->ID),
-                            selected($selected_author, $author->ID, false),
-                            esc_html($author->display_name)
-                        );
-                    }
-                    echo '</select>';
-                }
-            }
-        }
-        add_action( 'restrict_manage_posts', 'add_author_filter_dropdown' );
     }
 
     // ============================================================
@@ -1027,6 +1113,10 @@
         }
         add_action( 'wp_login', 'email_user_on_admin_login', 10, 2 );
     }
+
+    // ============================================================
+    // DELETE TOOLS FOR ACTION SCHEDULER
+    // ============================================================
 
     if ( ! function_exists( 'bulk_delete_action_scheduler_jobs' ) ) {
         /**

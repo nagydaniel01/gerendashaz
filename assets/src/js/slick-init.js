@@ -417,8 +417,8 @@ $('.slider--card').each(function() {
     }
 });
 
-// Image sliders
-$('.slider--image').each(function() {
+// Logo sliders
+$('.slider--logo').each(function() {
     const $slider = $(this).find('.slider__list');
     const $controls = $(this).find('.slider__controls');
 
@@ -434,7 +434,6 @@ $('.slider--image').each(function() {
             autoplaySpeed: 3000,
             slidesToShow: 1,
             slidesToScroll: 1,
-            variableWidth: true,
             arrows: false,
             prevArrow: '<button type="button" class="slick-arrow slick-prev" aria-label="Előző"><svg class="icon icon-chevron-left"><use xlink:href="#icon-chevron-left"></use></svg></button>',
             nextArrow: '<button type="button" class="slick-arrow slick-next" aria-label="Következő"><svg class="icon icon-chevron-right"><use xlink:href="#icon-chevron-right"></use></svg></button>',
@@ -445,6 +444,7 @@ $('.slider--image').each(function() {
                     settings: {
                         slidesToShow: 2,
                         slidesToScroll: 1,
+                        variableWidth: false,
                         arrows: true
                     }
                 },
@@ -453,6 +453,16 @@ $('.slider--image').each(function() {
                     settings: {
                         slidesToShow: 3,
                         slidesToScroll: 1,
+                        variableWidth: false,
+                        arrows: true
+                    }
+                },
+                {
+                    breakpoint: 1199,
+                    settings: {
+                        slidesToShow: 4,
+                        slidesToScroll: 1,
+                        variableWidth: true,
                         arrows: true
                     }
                 }

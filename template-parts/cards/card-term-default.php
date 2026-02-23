@@ -1,69 +1,73 @@
 <?php
-    $term        = $args['term'];
+$term        = $args['term'];
 
-    if (empty($term)) {
-        return;
+if (empty($term)) {
+    return;
+}
+
+$term_id     = $term->term_id;
+$taxonomy    = $term->taxonomy;
+$term_link   = get_term_link($term);
+$title       = $term->name;
+//$description = term_description($term_id, $taxonomy);
+
+$image_id  = '';
+$alt_text  = __('', 'gerendashaz');
+
+// If taxonomy is 'product_cat', get WooCommerce thumbnail
+if ($taxonomy === 'product_cat') {
+    $thumbnail_id = get_term_meta($term_id, 'thumbnail_id', true);
+    if ($thumbnail_id) {
+        $image_id = $thumbnail_id;
+        $alt_text = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true) ?: $title;
     }
+}
 
-    $term_id     = $term->term_id;
-    $taxonomy    = $term->taxonomy;
-    $term_link   = get_term_link($term);
-    $title       = $term->name;
-    //$description = term_description($term_id, $taxonomy);
+// Otherwise, use ACF gallery if available
+if ($taxonomy !== 'product_cat') {
+    $gallery = get_field('gallery', $taxonomy . '_' . $term_id);
 
-    $image_id  = '';
-    $alt_text  = __('', 'gerendashaz');
+    if ($gallery && is_array($gallery)) {
+        $first_image = $gallery[0];
 
-    // If taxonomy is 'product_cat', get WooCommerce thumbnail
-    if ($taxonomy === 'product_cat') {
-        $thumbnail_id = get_term_meta($term_id, 'thumbnail_id', true);
-        if ($thumbnail_id) {
-            $image_id = $thumbnail_id;
-            $alt_text = get_post_meta($thumbnail_id, '_wp_attachment_image_alt', true) ?: $title;
+        if (is_numeric($first_image)) {
+            $image_id = $first_image;
+            $alt_text = get_post_meta($image_id, '_wp_attachment_image_alt', true) ?: $title;
+        } elseif (is_array($first_image) && !empty($first_image['ID'])) {
+            $image_id = $first_image['ID'];
+            $alt_text = !empty($first_image['alt']) ? $first_image['alt'] : $title;
         }
     }
+}
 
-    // Otherwise, use ACF gallery if available
-    if ($taxonomy !== 'product_cat') {
-        $gallery = get_field('gallery', $taxonomy . '_' . $term_id);
+$classes = 'card card--term';
+if ($taxonomy) {
+    $classes = ' card--' . $taxonomy;
+}
 
-        if ($gallery && is_array($gallery)) {
-            $first_image = $gallery[0];
+do_action('theme_card_open', [
+    'post_id' => $post_id,
+    'classes' => $classes
+]);
 
-            if (is_numeric($first_image)) {
-                $image_id = $first_image;
-                $alt_text = get_post_meta($image_id, '_wp_attachment_image_alt', true) ?: $title;
-            } elseif (is_array($first_image) && !empty($first_image['ID'])) {
-                $image_id = $first_image['ID'];
-                $alt_text = !empty($first_image['alt']) ? $first_image['alt'] : $title;
-            }
-        }
-    }
+do_action('theme_card_link_open', [
+    'term_id'  => $term_id,
+    'taxonomy' => $taxonomy,
+]);
 
-    $extra_classes = '';
-    if ($taxonomy) {
-        $extra_classes = ' card--'.$taxonomy;
-    }
-?>
+do_action('theme_card_header', [
+    'image_id' => $image_id,
+    'alt_text' => $alt_text,
+]);
 
-<article id="<?php echo esc_attr($term_id); ?>" class="card card--term<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
-    <a href="<?php echo esc_url($term_link); ?>" class="card__link">
-        <?php if ($image_id) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <?php echo wp_get_attachment_image($image_id, 'medium_large', false, ['class' => 'card__image', 'alt' => esc_attr($alt_text), 'loading' => 'lazy']); ?>
-                </div>
-            </div>
-        <?php elseif ( defined( 'PLACEHOLDER_IMG_SRC' ) && PLACEHOLDER_IMG_SRC ) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <img width="150" height="150" src="<?php echo esc_url( PLACEHOLDER_IMG_SRC ); ?>" alt="" class="card__image card__image--placeholder" loading="lazy">
-                </div>
-            </div>
-        <?php endif; ?>
+do_action('theme_card_content_open');
 
-        <div class="card__content">
-            <h3 class="card__title"><?php echo esc_html($title); ?></h3>
-        </div>
-    </a>
-</article>
+do_action('theme_card_title', [
+    'card_title' => $title,
+]);
+
+do_action('theme_card_content_close');
+
+do_action('theme_card_link_close');
+
+do_action('theme_card_close');

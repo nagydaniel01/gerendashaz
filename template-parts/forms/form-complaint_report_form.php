@@ -33,7 +33,7 @@
         <label class="form-label" for="<?php echo esc_attr($prefix); ?>subject">
             <?php echo esc_html__( 'Subject', 'gerendashaz' ); ?> <span class="required">*</span>
         </label>
-        <input type="text" class="form-control" id="<?php echo esc_attr($prefix); ?>subject" name="<?php echo esc_attr($prefix); ?>subject" placeholder="<?php echo esc_attr_x( 'Enter subject', 'placeholder', 'gerendashaz' ); ?>" required aria-required="true">
+        <input type="text" class="form-control" id="<?php echo esc_attr($prefix); ?>subject" name="<?php echo esc_attr($prefix); ?>subject" placeholder="<?php echo esc_attr_x( 'Enter a subject', 'placeholder', 'gerendashaz' ); ?>" required aria-required="true">
     </div>
 
     <div class="mb-3">

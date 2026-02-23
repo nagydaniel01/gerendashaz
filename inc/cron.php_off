@@ -3,18 +3,18 @@
         exit; // Exit if accessed directly
     }
 
-    if ( ! function_exists( 'gerendashaz_schedule_daily_orders_summary' ) ) {
+    if ( ! function_exists( 'my_theme_schedule_daily_orders_summary' ) ) {
         /**
          * Schedule daily email exactly at 17:00 UTC
          */
-        function gerendashaz_schedule_daily_orders_summary() {
+        function my_theme_schedule_daily_orders_summary() {
 
             if ( ! class_exists( 'ActionScheduler' ) ) {
                 return;
             }
 
             // Prevent duplicates
-            if ( as_next_scheduled_action( 'gerendashaz_send_daily_orders_summary', [], 'gerendashaz' ) ) {
+            if ( as_next_scheduled_action( 'my_theme_send_daily_orders_summary', [], 'gerendashaz' ) ) {
                 return;
             }
 
@@ -32,19 +32,19 @@
             as_schedule_recurring_action(
                 $run->getTimestamp(),        // ALWAYS 17:00:00
                 DAY_IN_SECONDS,              // 86400
-                'gerendashaz_send_daily_orders_summary',
+                'my_theme_send_daily_orders_summary',
                 [],
                 'gerendashaz'
             );
         }
-        add_action( 'after_switch_theme', 'gerendashaz_schedule_daily_orders_summary' );
+        add_action( 'after_switch_theme', 'my_theme_schedule_daily_orders_summary' );
     }
 
-    if ( ! function_exists( 'gerendashaz_send_daily_orders_summary_email' ) ) {
+    if ( ! function_exists( 'my_theme_send_daily_orders_summary_email' ) ) {
         /**
          * Send HTML detailed daily WooCommerce orders summary.
          */
-        function gerendashaz_send_daily_orders_summary_email() {
+        function my_theme_send_daily_orders_summary_email() {
             if ( ! class_exists( 'WooCommerce' ) ) {
                 return;
             }
@@ -250,31 +250,31 @@
                 ['Content-Type: text/html; charset=UTF-8']
             );
         }
-        add_action('gerendashaz_send_daily_orders_summary', 'gerendashaz_send_daily_orders_summary_email');
+        add_action('my_theme_send_daily_orders_summary', 'my_theme_send_daily_orders_summary_email');
     }
 
-    if ( ! function_exists( 'gerendashaz_render_daily_orders_widget' ) ) {
+    if ( ! function_exists( 'my_theme_render_daily_orders_widget' ) ) {
         /**
          * Registers the "Daily Orders Summary" dashboard widget in WordPress.
          *
          * This widget displays daily WooCommerce order totals, product quantities,
          * and provides a button to send the daily report email manually.
          */
-        function gerendashaz_register_daily_orders_widget() {
+        function my_theme_register_daily_orders_widget() {
             if ( ! class_exists( 'WooCommerce' ) ) {
                 return;
             }
 
             wp_add_dashboard_widget(
-                'gerendashaz_daily_orders_widget',
+                'my_theme_daily_orders_widget',
                 __( 'Daily Orders Summary', 'gerendashaz' ),
-                'gerendashaz_render_daily_orders_widget'
+                'my_theme_render_daily_orders_widget'
             );
         }
-        add_action( 'wp_dashboard_setup', 'gerendashaz_register_daily_orders_widget' );
+        add_action( 'wp_dashboard_setup', 'my_theme_register_daily_orders_widget' );
     }
 
-    if ( ! function_exists( 'gerendashaz_render_daily_orders_widget' ) ) {
+    if ( ! function_exists( 'my_theme_render_daily_orders_widget' ) ) {
         /**
          * Renders the content of the "Daily Orders Summary" dashboard widget.
          *
@@ -292,7 +292,7 @@
          * - Nonce verification is used for the manual send button.
          * - Checks if required functions exist before running.
          */
-        function gerendashaz_render_daily_orders_widget() {
+        function my_theme_render_daily_orders_widget() {
             if ( ! current_user_can( 'manage_woocommerce' ) ) {
                 echo '<p>' . esc_html__( 'You do not have permission to view this data.', 'gerendashaz' ) . '</p>';
                 return;
@@ -300,11 +300,11 @@
 
             // Manual send (only if function exists)
             if (
-                isset( $_POST['gerendashaz_send_daily_report'] ) &&
-                function_exists( 'gerendashaz_send_daily_orders_summary_email' ) &&
-                check_admin_referer( 'gerendashaz_send_daily_report_action' )
+                isset( $_POST['my_theme_send_daily_report'] ) &&
+                function_exists( 'my_theme_send_daily_orders_summary_email' ) &&
+                check_admin_referer( 'my_theme_send_daily_report_action' )
             ) {
-                gerendashaz_send_daily_orders_summary_email();
+                my_theme_send_daily_orders_summary_email();
                 echo '<div class="notice notice-success inline"><p>' .
                     esc_html__( 'Daily report email sent.', 'gerendashaz' ) .
                     '</p></div>';
@@ -401,13 +401,13 @@
             echo '</p>';
 
             // Button
-            if ( function_exists( 'gerendashaz_send_daily_orders_summary_email' ) ) {
+            if ( function_exists( 'my_theme_send_daily_orders_summary_email' ) ) {
                 echo '<form method="post" style="margin-top:12px">';
-                wp_nonce_field( 'gerendashaz_send_daily_report_action' );
+                wp_nonce_field( 'my_theme_send_daily_report_action' );
                 submit_button(
                     __( 'Send daily report now', 'gerendashaz' ),
                     'primary',
-                    'gerendashaz_send_daily_report',
+                    'my_theme_send_daily_report',
                     false
                 );
                 echo '</form>';

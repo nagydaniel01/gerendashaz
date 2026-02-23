@@ -20,6 +20,13 @@
 }
 */
 
+// Text that is selected by a user
+::selection {
+  background: $primary;
+  color: $white;
+  text-shadow: none;
+}
+
 /* ------------------------- */
 /* Preserve Custom Classes    */
 /* ------------------------- */

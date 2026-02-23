@@ -120,8 +120,13 @@ $products      = $product_query->get_products();
 ?>
 
 <?php if (!empty($products)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--product_query<?php echo esc_attr($section_classes); ?><?php echo ($slider != false) ? ' section--slider' : ''; ?>">
-        <div class="container">
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--product_query' . esc_attr($section_classes) . ($slider ? ' section--slider' : ''),
+    ]); ?>
+
+        <?php do_action('theme_section_container_open'); ?>
+        
             <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
                 <div class="section__header">
                     <?php if ($section_hide_title !== true) : ?>
@@ -141,7 +146,8 @@ $products      = $product_query->get_products();
                 </div>
             <?php endif; ?>
 
-            <div class="section__content">
+            <?php do_action('theme_section_content_open'); ?>
+
                 <?php if ($slider != false) : ?>
                     <div class="slider slider--product-query">
                         <div class="slider__list">
@@ -183,9 +189,12 @@ $products      = $product_query->get_products();
                         <?php wp_reset_postdata(); ?>
                     </ul>
                 <?php endif; ?>
-            </div>
-        </div>
-    </section>
+
+            <?php do_action('theme_section_content_close'); ?>
+
+        <?php do_action('theme_section_container_close'); ?>
+
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>
 
 <?php

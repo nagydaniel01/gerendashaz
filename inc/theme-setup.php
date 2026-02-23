@@ -22,7 +22,7 @@
             //set_post_thumbnail_size( 150, 150 ); // 50 pixels wide by 50 pixels tall, resize mode
 
             // Add image sizes
-            add_image_size( 'product-sticky-thumbnail', 0, 64, false );
+            //add_image_size( 'product-sticky-thumbnail', 0, 64, false );
 
             /**
              * Supported formats
@@ -167,6 +167,88 @@
         add_action( 'init', 'theme_init' );
     }
 
+    if ( ! function_exists( 'custom_set_image_sizes' ) ) {
+        /**
+         * Set custom WordPress image sizes.
+         *
+         * Updates the default thumbnail, medium, medium large and large image sizes
+         * and optionally sets hard cropping for thumbnails.
+         * Runs on theme setup.
+         *
+         * @return void
+         */
+        function custom_set_image_sizes() {
+            // Thumbnail (square avatars/cards)
+            update_option( 'thumbnail_size_w', 220 );
+            update_option( 'thumbnail_size_h', 220 );
+            update_option( 'thumbnail_crop', 1 );
+
+            // Medium (2× thumbnail for retina)
+            update_option( 'medium_size_w', 440 );
+            update_option( 'medium_size_h', 440 );
+
+            // Medium Large (card images)
+            update_option( 'medium_large_size_w', 660 );
+            update_option( 'medium_large_size_h', 660 );
+
+            // Large (full-width content images)
+            update_option( 'large_size_w', 1320 );
+            update_option( 'large_size_h', 1320 );
+        }
+        add_action( 'after_switch_theme', 'custom_set_image_sizes' );
+    }
+
+    if ( ! function_exists( 'wp_remove_default_image_sizes' ) ) {
+        /**
+         * Removes unused default WordPress image sizes.
+         *
+         * This prevents WordPress from generating unnecessary thumbnails
+         * during image uploads, reducing storage usage and processing time.
+         *
+         * @return void
+         */
+        function wp_remove_default_image_sizes() {
+            // Default WP sizes
+            remove_image_size( '1536x1536' );
+            remove_image_size( '2048x2048' );
+            
+            // If not needed, also remove these (optional)
+            // remove_image_size( 'thumbnail' );
+            // remove_image_size( 'medium' );
+            // remove_image_size( 'medium_large' );
+            // remove_image_size( 'large' );
+        }
+        add_action( 'init', 'wp_remove_default_image_sizes' );
+    }
+
+    if ( ! function_exists( 'wp_unset_intermediate_image_sizes' ) ) {
+        /**
+         * Filters out unwanted intermediate image sizes.
+         *
+         * @param array $sizes Registered image sizes.
+         * @return array Cleaned image sizes.
+         */
+        function wp_unset_intermediate_image_sizes( $sizes ) {
+
+            unset( $sizes['thumbnail'] );
+            unset( $sizes['medium'] );
+            unset( $sizes['medium_large'] );
+            unset( $sizes['large'] );
+            unset( $sizes['1536x1536'] );
+            unset( $sizes['2048x2048'] );
+
+            // WooCommerce examples (remove if not used)
+            /*
+            unset( $sizes['woocommerce_thumbnail'] );
+            unset( $sizes['woocommerce_single'] );
+            unset( $sizes['woocommerce_gallery_thumbnail'] );
+            */
+
+            return $sizes;
+        }
+        //add_filter( 'intermediate_image_sizes_advanced', 'wp_unset_intermediate_image_sizes' );
+    }
+
     // Enable native lazy loading for images
     add_filter( 'wp_lazy_loading_enabled', '__return_true' );
 
@@ -253,88 +335,6 @@
 
     // Flush rewrite rules on theme activation to register the endpoint
     add_action( 'after_switch_theme', 'flush_rewrite_rules' );
-
-    if ( ! function_exists( 'add_all_settings_menu' ) ) {
-        /**
-         * Adds a link to "All Settings" in the WordPress admin menu (for administrators only).
-         *
-         * @return void
-         */
-        function add_all_settings_menu() {
-            if ( is_admin() && current_user_can('administrator') ) {
-                add_options_page( 
-                    __('All Settings'), 
-                    __('All Settings'), 
-                    'administrator', 
-                    'options.php' 
-                );
-            }
-        }
-        add_action( 'admin_menu', 'add_all_settings_menu' );
-    }
-
-    if ( ! function_exists( 'custom_restrict_options_admin_access' ) ) {
-        /**
-         * Restricts access to certain admin settings pages for non-primary administrators.
-         *
-         * @return void
-         */
-        function custom_restrict_options_admin_access() {
-            $user = wp_get_current_user();
-
-            if ( in_array('administrator', (array) $user->roles, true) && $user->ID !== 1 ) {
-                // Remove menu items
-                add_action( 'admin_menu', 'custom_remove_options_admin_menus', 999 );
-
-                // Block access to specific admin pages
-                add_action( 'admin_enqueue_scripts', 'custom_block_options_admin_pages' );
-            }
-        }
-        add_action( 'init', 'custom_restrict_options_admin_access' );
-    }
-
-    if ( ! function_exists( 'custom_remove_options_admin_menus' ) ) {
-        /**
-         * Removes specific admin menus for secondary administrators.
-         *
-         * @return void
-         */
-        function custom_remove_options_admin_menus() {
-            $menus_to_remove = [
-                //'options-general.php', // Settings menu
-            ];
-    
-            foreach ($menus_to_remove as $menu) {
-                remove_menu_page($menu);
-            }
-    
-            $submenus_to_remove = [
-                ['options-general.php', 'options.php'], // "All Settings"
-            ];
-    
-            foreach ($submenus_to_remove as $submenu) {
-                remove_submenu_page($submenu[0], $submenu[1]);
-            }
-        }
-    }
-    
-    if ( ! function_exists( 'custom_block_options_admin_pages' ) ) {
-        /**
-         * Blocks direct access to restricted admin pages for secondary administrators.
-         *
-         * @param string $hook The current admin page hook.
-         * @return void
-         */
-        function custom_block_options_admin_pages( $hook ) {
-            $restricted_hooks = [
-                'options.php', // Block direct access to "All Settings"
-            ];
-    
-            if ( in_array($hook, $restricted_hooks, true) ) {
-                wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
-            }
-        }
-    }
 
     if ( ! function_exists( 'add_environment_pill' ) ) {
         /**

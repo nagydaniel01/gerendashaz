@@ -37,19 +37,19 @@
 ?>
 
 <?php if (!empty($slider_items)) : ?>
-    <section id="<?php echo esc_attr($section_slug); ?>" class="section section--slider pt-0 pb-0">
-        <?php if (($section_title && $section_hide_title !== true) || $section_lead) : ?>
-            <div class="section__header">
-                <?php if ($section_hide_title !== true) : ?>
-                    <h1 class="section__title"><?php echo esc_html($section_title); ?></h1>
-                <?php endif; ?>
-                <?php if (!empty($section_lead)) : ?>
-                    <div class="section__lead"><?php echo wp_kses_post($section_lead); ?></div>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+    <?php do_action('theme_section_open', [
+        'id'      => $section_slug,
+        'classes' => 'section section--slider pt-0 pb-0',
+    ]); ?>
+
+        <?php do_action('theme_section_header', [
+            'title'      => $section_title,
+            'hide_title' => $section_hide_title,
+            'lead'       => $section_lead,
+        ]); ?>
         
-        <div class="section__content">
+        <?php do_action('theme_section_content_open'); ?>
+
             <div class="slider slider--main" id="<?php echo esc_attr($section_slug); ?>-slider">
                 <div class="slider__list">
                     <?php foreach ($slider_items as $key => $item) : 
@@ -87,7 +87,7 @@
                                 <div class="slider__video-wrapper<?php echo $slider_height ? '' : ' ratio ratio-' . esc_attr($slider_ratio); ?>" <?php echo $slider_height ? 'style="height:' . esc_attr($slider_height) . 'px;"' : ''; ?>>
                                     <video class="slider__video" autoplay muted loop playsinline>
                                         <source src="<?php echo esc_url($video_url); ?>" type="video/mp4">
-                                        Your browser does not support the video tag.
+                                        <?php esc_html_e('Your browser does not support the video tag.', 'gerendashaz'); ?>
                                     </video>
                                     <div class="slider__overlay"></div>
                                 </div>
@@ -124,6 +124,8 @@
                 </div>
                 <div class="slider__controls"></div>
             </div>
-        </div>
-    </section>
+            
+        <?php do_action('theme_section_content_close'); ?>
+        
+    <?php do_action('theme_section_close'); ?>
 <?php endif; ?>

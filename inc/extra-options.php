@@ -2,231 +2,481 @@
     if ( ! defined( 'ABSPATH' ) ) {
         exit; // Exit if accessed directly
     }
-    
-    if ( ! function_exists( 'clean_wp_head' ) ) {
+
+    if ( ! function_exists( 'open_external_links_in_new_tab' ) ) {
         /**
-         * Clean up unnecessary elements from the WordPress <head> section.
+         * Open External Links in a New Tab
          *
-         * This function removes default WordPress actions that inject metadata, links, and scripts
-         * into the <head> of your HTML. These can be removed to improve performance and reduce clutter.
+         * This function scans post content and modifies all external links
+         * so that they open in a new browser tab with proper security attributes.
          *
-         * Note: This keeps comment functionality intact.
+         * It is applied to both regular post content and ACF WYSIWYG fields.
+         *
+         * @param string $content The post content or ACF WYSIWYG field value.
+         * @return string Modified content with external links opening in a new tab.
          */
-        function clean_wp_head() {
-            // Remove the WordPress version number
-            remove_action( 'wp_head', 'wp_generator' );
-        
-            // Remove Really Simple Discovery (RSD) link
-            remove_action( 'wp_head', 'rsd_link' );
-        
-            // Remove Windows Live Writer manifest link
-            remove_action( 'wp_head', 'wlwmanifest_link' );
-        
-            // Remove shortlink for the current page
-            remove_action( 'wp_head', 'wp_shortlink_wp_head', 10, 0 );
-        
-            // Remove REST API link tag
-            remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
-        
-            // Remove oEmbed discovery links
-            remove_action( 'wp_head', 'wp_oembed_add_discovery_links', 10 );
-        
-            // Remove oEmbed host JavaScript
-            remove_action( 'wp_head', 'wp_oembed_add_host_js' );
-        
-            // Remove adjacent posts relational links
-            remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
-        
-            // Disable emoji scripts and styles
-            remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-            remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
-            remove_action( 'wp_print_styles', 'print_emoji_styles' );
-            remove_action( 'admin_print_styles', 'print_emoji_styles' );
-        
-            // Remove default feed links (RSS)
-            remove_action( 'wp_head', 'feed_links', 2 );
-            remove_action( 'wp_head', 'feed_links_extra', 3 );
-        }
-
-        add_action( 'init', 'clean_wp_head' );
-    }
-
-    if ( ! function_exists( 'dequeue_unwanted_styles' ) ) {
-        /**
-         * Dequeue unwanted frontend styles to reduce CSS bloat.
-         *
-         * This removes default Gutenberg, WooCommerce, and global theme styles.
-         */
-        function dequeue_unwanted_styles() {
-            // Dequeue block editor styles
-            wp_dequeue_style( 'wp-block-library' );
-            wp_dequeue_style( 'wp-block-library-theme' );
-
-            // Dequeue WooCommerce block styles
-            wp_dequeue_style( 'wc-block-style' );
-
-            // Dequeue Classic and Global Theme styles
-            wp_dequeue_style( 'classic-theme-styles' );
-            wp_dequeue_style( 'global-styles' );
-        }
-
-        add_action( 'wp_enqueue_scripts', 'dequeue_unwanted_styles', 100 );
-    }
-
-    if ( ! function_exists( 'load_jquery_by_cdn' ) ) {
-        /**
-         * Load jQuery from Google's CDN on the frontend.
-         *
-         * This function replaces the default WordPress jQuery core script
-         * URL with the corresponding version hosted on Google's CDN.
-         * It only runs on the frontend (non-admin pages).
-         *
-         * Note: This function modifies the global $wp_scripts object directly,
-         * changing the 'jquery-core' script's source URL to the CDN URL.
-         *
-         * @return void
-         */
-        function load_jquery_by_cdn() {
-            if (is_admin()) {
-                return;
+        function open_external_links_in_new_tab( $content ) {
+            // Ensure content is a string to avoid errors
+            if (!is_string( $content ) || trim( $content ) === '') {
+                return $content;
             }
 
-            $protocol = is_ssl() ? 'https' : 'http';
+            // Get the site's base URL
+            $site_url = get_home_url();
 
-            /** @var WP_Scripts $wp_scripts */
-            global $wp_scripts;
+            // Use preg_replace_callback safely to find anchor tags
+            $modified_content = @preg_replace_callback(
+                '/<a\s+([^>]*?)href=["\'](https?:\/\/[^"\']+)["\']([^>]*)>/i',
+                function ($matches) use ($site_url) {
+                    $before = $matches[1];
+                    $link   = trim($matches[2]);
+                    $after  = $matches[3];
 
-            // Modify jQuery Core to load from CDN
-            if (isset($wp_scripts->registered['jquery-core'])) {
-                $core = $wp_scripts->registered['jquery-core'];
-                $core_version = $core->ver;
-                $core->src = "$protocol://ajax.googleapis.com/ajax/libs/jquery/$core_version/jquery.min.js";
-            }
+                    // Skip internal links (including subpages)
+                    if (strpos($link, $site_url) === 0) {
+                        return '<a ' . $before . 'href="' . esc_url($link) . '"' . $after . '>';
+                    }
 
-            // Ensure 'jquery' depends only on 'jquery-core'
-            if (isset($wp_scripts->registered['jquery'])) {
-                $jquery = $wp_scripts->registered['jquery'];
-                $jquery->deps = ['jquery-core'];
-            }
-        }
-        
-        //add_action( 'init', 'load_jquery_by_cdn', 20 );
-    }
-
-    if ( ! function_exists( 'add_jquery_by_cdn' ) ) {
-        /**
-         * Register and enqueue jQuery from Google's CDN in the footer.
-         *
-         * This function deregisters the default WordPress jQuery script and
-         * registers a new one from Google's CDN, using the jQuery version
-         * currently registered in WordPress core (or a default fallback).
-         * The script is loaded in the footer for better page load performance.
-         *
-         * This runs only on the frontend, not in admin pages.
-         *
-         * @return void
-         */
-        function add_jquery_by_cdn() {
-            // Only modify scripts on the frontend
-            if ( is_admin() ) {
-                return;
-            }
-
-            global $wp_scripts;
-
-            // Ensure $wp_scripts is initialized and is an instance of WP_Scripts
-            if ( ! ( $wp_scripts instanceof WP_Scripts ) ) {
-                return;
-            }
-
-            // Default jQuery version fallback
-            $default_version = '3.7.1';
-            $jquery_version  = $default_version;
-
-            // Attempt to get jQuery version from 'jquery-core'
-            if ( isset( $wp_scripts->registered['jquery-core'] ) && is_object( $wp_scripts->registered['jquery-core'] ) ) {
-                $core_script = $wp_scripts->registered['jquery-core'];
-
-                if ( isset( $core_script->ver ) && is_string( $core_script->ver ) && preg_match( '/^\d+\.\d+(\.\d+)?$/', $core_script->ver ) ) {
-                    $jquery_version = $core_script->ver;
-                }
-            }
-
-            $protocol       = is_ssl() ? 'https' : 'http';
-            $cdn_url        = "{$protocol}://ajax.googleapis.com/ajax/libs/jquery/{$jquery_version}/jquery.min.js";
-
-            // Deregister jQuery if it's already registered
-            if ( wp_script_is( 'jquery', 'registered' ) ) {
-                wp_deregister_script( 'jquery' );
-            }
-
-            // Register and enqueue the CDN jQuery version in the footer
-            wp_register_script( 'jquery', esc_url( $cdn_url ), [], $jquery_version, true );
-            wp_enqueue_script( 'jquery' );
-        }
-
-        add_action( 'wp_enqueue_scripts', 'add_jquery_by_cdn', 20 );
-    }
-
-    if ( ! function_exists( 'add_defer_to_scripts' ) ) {
-        /**
-         * Adds the 'defer' attribute to script tags for non-logged-in users, excluding jQuery.
-         *
-         * @param string $tag The HTML script tag.
-         * @param string $handle The script's registered handle.
-         * @param string $src The script source URL.
-         * @return string Modified script tag with 'defer' attribute if appropriate.
-         */
-        function add_defer_to_scripts( $tag, $handle, $src ) {
-            // Only apply for non-logged-in users
-            if ( is_user_logged_in() ) {
-                return $tag;
-            }
-
-            // Skip jQuery and any known dependencies that shouldn't be deferred
-            $excluded_handles = array(
-                'jquery',
-                'jquery-core',
-                'jquery-migrate',
+                    // Add target and rel attributes safely for external links
+                    $new_tag = '<a ' . $before . 'href="' . esc_url($link) . '" target="_blank" rel="noopener noreferrer"' . $after . '>';
+                    return $new_tag;
+                },
+                $content
             );
 
-            if ( in_array( $handle, $excluded_handles, true ) ) {
-                return $tag;
+            // If regex fails, fall back to the original content
+            if ($modified_content === null) {
+                return $content;
             }
 
-            // Ensure the tag contains a JS file
-            if ( strpos( $src, '.js' ) === false ) {
-                return $tag;
-            }
-
-            // Add 'defer' if not already present
-            if ( false === strpos( $tag, ' defer' ) ) {
-                $tag = str_replace( '<script ', '<script defer ', $tag );
-            }
-
-            return $tag;
+            return $modified_content;
         }
-
-        //add_filter( 'script_loader_tag', 'add_defer_to_scripts', 10, 3 );
+        add_filter( 'the_content', 'open_external_links_in_new_tab' );
+        add_filter( 'acf/format_value/type=wysiwyg', 'open_external_links_in_new_tab' );
+        add_filter( 'acf/format_value/type=textarea', 'open_external_links_in_new_tab' );
     }
 
-    if ( ! function_exists( 'remove_jquery_migrate' ) ) {
+    if ( ! function_exists( 'custom_bootstrap_wrap_oembed' ) ) {
         /**
-         * Optional: Remove jQuery Migrate if not needed on the front end.
+         * Wrap oEmbed HTML in a Bootstrap responsive ratio container.
          *
-         * @param WP_Scripts $scripts The WP_Scripts object.
+         * This function removes hardcoded width and height attributes from
+         * embedded content (like YouTube, Vimeo, etc.) and wraps the HTML
+         * in a Bootstrap 16:9 responsive ratio container.
+         *
+         * @param string $html The original oEmbed HTML.
+         * @return string Modified HTML wrapped in a responsive container.
          */
-        function remove_jquery_migrate( $scripts ) {
-            if ( ! is_admin() && isset( $scripts->registered['jquery'] ) ) {
-                $script = $scripts->registered['jquery'];
-                if ( $script->deps ) {
-                    $script->deps = array_diff( $script->deps, array( 'jquery-migrate' ) );
+        function custom_bootstrap_wrap_oembed( $html ) {
+
+            // Remove width and height attributes
+            $html = preg_replace( '/(width|height)="\d*"\s?/', '', $html );
+
+            // Wrap in Bootstrap responsive ratio container
+            return '<div class="ratio ratio-16x9">' . $html . '</div>';
+        }
+        add_filter( 'embed_oembed_html', 'custom_bootstrap_wrap_oembed', 10, 1 );
+    }
+
+    if ( ! function_exists( 'custom_bootstrap_wrap_wp_video' ) ) {
+        /**
+         * Wrap WordPress video shortcode output in a Bootstrap responsive ratio container.
+         *
+         * This function removes hardcoded width and height attributes from the <video> tag
+         * generated by the WordPress video shortcode and wraps it in a Bootstrap 16:9
+         * responsive ratio container.
+         *
+         * @param string $html     The HTML output of the video shortcode.
+         * @param array  $atts     Shortcode attributes.
+         * @param string $video    Video URL or file object.
+         * @param int    $post_id  Post ID where the video is embedded.
+         * @param string $library  Media library context.
+         * @return string Modified HTML wrapped in a responsive container.
+         */
+        function custom_bootstrap_wrap_wp_video( $html, $atts, $video, $post_id, $library ) {
+
+            // Remove width and height attributes from the <video> tag
+            $html = preg_replace( '/(width|height)="\d*"\s?/', '', $html );
+
+            // Wrap in Bootstrap responsive ratio container
+            return '<div class="ratio ratio-16x9">' . $html . '</div>';
+        }
+        add_filter( 'wp_video_shortcode', 'custom_bootstrap_wrap_wp_video', 10, 5 );
+    }
+
+    if ( ! function_exists( 'custom_archive_title' ) ) {
+        /**
+         * Customize WordPress archive titles.
+         *
+         * This function removes default prefixes like "Category:", "Tag:", etc.,
+         * and provides clean titles for categories, tags, authors, custom post type
+         * archives, custom taxonomies, and date-based archives.
+         *
+         * @param string $title The original archive title.
+         * @return string Modified archive title.
+         */
+        function custom_archive_title( $title ) {
+
+            switch ( true ) {
+
+                case is_category():
+                    $title = single_cat_title( '', false );
+                    break;
+
+                case is_tag():
+                    $title = single_tag_title( '', false );
+                    break;
+
+                case is_author():
+                    $title = '<span class="vcard">' . get_the_author() . '</span>';
+                    break;
+
+                case is_post_type_archive():
+                    $title = post_type_archive_title( '', false );
+                    break;
+
+                case is_tax():
+                    $title = single_term_title( '', false );
+                    break;
+
+                case is_year():
+                    $title = get_the_date( _x( 'Y', 'yearly archives date format', 'gerendashaz' ) );
+                    break;
+
+                case is_month():
+                    $title = get_the_date( _x( 'F Y', 'monthly archives date format', 'gerendashaz' ) );
+                    break;
+
+                case is_day():
+                    $title = get_the_date( _x( 'F j, Y', 'daily archives date format', 'gerendashaz' ) );
+                    break;
+
+                case is_home():
+                    $title = get_the_title( get_option( 'page_for_posts', true ) );
+                    break;
+
+                default:
+                    break;
+            }
+
+            return $title;
+        }
+        add_filter( 'get_the_archive_title', 'custom_archive_title' );
+    }
+
+    if ( ! function_exists( 'wp_preload_post_thumbnail' ) ) {
+        /**
+         * Preload featured image on singular posts/pages.
+         *
+         * Outputs a <link rel="preload"> tag in the document head
+         * for the post thumbnail when viewing a singular post.
+         *
+         * @return void
+         */
+        function wp_preload_post_thumbnail() {
+
+            if ( ! is_singular() || ! has_post_thumbnail() ) {
+                return;
+            }
+
+            $thumb_id  = get_post_thumbnail_id();
+            $thumb_url = wp_get_attachment_image_url( $thumb_id, 'full' );
+
+            if ( $thumb_url ) {
+                printf(
+                    '<link rel="preload" as="image" fetchpriority="high" href="%s" />' . "\n",
+                    esc_url( $thumb_url )
+                );
+            }
+        }
+        add_action( 'wp_head', 'wp_preload_post_thumbnail' );
+    }
+
+    if ( ! function_exists( 'wp_preload_woocommerce_main_image' ) ) {
+        /**
+         * Preload main WooCommerce product image.
+         *
+         * Outputs a <link rel="preload"> tag in the document head
+         * for the main product image on single product pages.
+         *
+         * @return void
+         */
+        function wp_preload_woocommerce_main_image() {
+
+            if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+                return;
+            }
+
+            global $product;
+
+            if ( empty( $product ) || ! is_a( $product, 'WC_Product' ) ) {
+                return;
+            }
+
+            $image_url = wp_get_attachment_image_url( $product->get_image_id(), 'large' );
+
+            if ( $image_url ) {
+                printf(
+                    '<link rel="preload" as="image" fetchpriority="high" href="%s" />' . "\n",
+                    esc_url( $image_url )
+                );
+            }
+        }
+        add_action( 'wp_head', 'wp_preload_woocommerce_main_image' );
+    }
+
+    if ( ! function_exists( 'wp_preload_woocommerce_gallery' ) ) {
+        /**
+         * Preload first WooCommerce product gallery image.
+         *
+         * Outputs a <link rel="preload"> tag in the document head
+         * for the first gallery image on single product pages.
+         *
+         * @return void
+         */
+        function wp_preload_woocommerce_gallery() {
+
+            if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+                return;
+            }
+
+            global $product;
+
+            if ( empty( $product ) || ! is_a( $product, 'WC_Product' ) ) {
+                return;
+            }
+
+            $gallery_image_ids = $product->get_gallery_image_ids();
+
+            if ( empty( $gallery_image_ids ) || ! is_array( $gallery_image_ids ) ) {
+                return;
+            }
+
+            $first_gallery_image_url = wp_get_attachment_image_url( $gallery_image_ids[0], 'large' );
+
+            if ( $first_gallery_image_url ) {
+                printf(
+                    '<link rel="preload" as="image" fetchpriority="high" href="%s" />' . "\n",
+                    esc_url( $first_gallery_image_url )
+                );
+            }
+        }
+        add_action( 'wp_head', 'wp_preload_woocommerce_gallery' );
+    }
+
+    if ( ! function_exists( 'get_page_first_section' ) ) {
+        /**
+         * Get first ACF flexible content section for a page.
+         *
+         * @param int|null $page_id Page ID. Defaults to current page.
+         * @return array|null       First section array or null.
+         */
+        function get_page_first_section( $page_id = null ) {
+
+            if ( ! function_exists( 'get_field' ) ) {
+                return null;
+            }
+
+            $page_id = $page_id ?: get_the_ID();
+
+            if ( ! $page_id ) {
+                return null;
+            }
+
+            $sections = get_field( 'sections', $page_id );
+
+            if ( ! empty( $sections ) && is_array( $sections ) ) {
+                return reset( $sections );
+            }
+
+            return null;
+        }
+    }
+
+    if ( ! function_exists( 'my_theme_preload_first_two_slider_images' ) ) {
+        /**
+         * Preload first two slider images in all standard WordPress sizes.
+         *
+         * Handles ACF image return formats: ID, array, or URL.
+         *
+         * @return void
+         */
+        function my_theme_preload_first_two_slider_images() {
+            // Only run on singular pages
+            if ( ! is_singular() ) {
+                return;
+            }
+
+            // Require ACF
+            if ( ! function_exists( 'get_field' ) ) {
+                return;
+            }
+
+            // Get first section
+            if ( ! function_exists( 'get_page_first_section' ) ) {
+                return;
+            }
+
+            $section = get_page_first_section();
+
+            if ( ! is_array( $section ) ) {
+                return;
+            }
+
+            // Validate layout
+            $layout = $section['acf_fc_layout'] ?? '';
+            if ( ! $layout || sanitize_file_name( $layout ) !== 'slider' ) {
+                return;
+            }
+
+            // Get slider items safely
+            $slider_items = $section['slider_items'] ?? [];
+            if ( ! is_array( $slider_items ) || empty( $slider_items ) ) {
+                return;
+            }
+
+            // Only first 2 images
+            $first_two_items = array_slice( $slider_items, 0, 2 );
+
+            // WordPress standard sizes
+            $sizes = [ 'thumbnail', 'medium', 'medium_large', 'large', 'full' ];
+
+            foreach ( $first_two_items as $item ) {
+
+                $slide_image = $item['slide_image'] ?? null;
+                if ( ! $slide_image ) {
+                    continue;
+                }
+
+                // Normalize ACF image → attachment ID
+                $attachment_id = null;
+
+                if ( is_numeric( $slide_image ) ) {
+                    $attachment_id = (int) $slide_image;
+
+                } elseif ( is_array( $slide_image ) ) {
+                    $attachment_id = $slide_image['ID'] ?? null;
+
+                } elseif ( is_string( $slide_image ) ) {
+                    $attachment_id = attachment_url_to_postid( $slide_image );
+                }
+
+                if ( ! $attachment_id ) {
+                    continue;
+                }
+
+                foreach ( $sizes as $size ) {
+
+                    $image_url = wp_get_attachment_image_url( $attachment_id, $size );
+                    if ( ! $image_url ) {
+                        continue;
+                    }
+
+                    // Prevent duplicate preload if same as featured image
+                    if ( has_post_thumbnail() ) {
+                        $featured = wp_get_attachment_image_url(
+                            get_post_thumbnail_id(),
+                            $size
+                        );
+
+                        if ( $featured && $featured === $image_url ) {
+                            continue;
+                        }
+                    }
+
+                    printf(
+                        '<link rel="preload" as="image" fetchpriority="high" href="%s" />' . "\n",
+                        esc_url( $image_url )
+                    );
                 }
             }
         }
-
-        add_action( 'wp_default_scripts', 'remove_jquery_migrate' );
+        add_action( 'wp_head', 'my_theme_preload_first_two_slider_images', 1 );
     }
 
-    //add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
-    add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
+    if ( ! function_exists( 'fix_site_name_text' ) ) {
+        /**
+         * Normalize ANY variation of the site name in content
+         * - Replaces text inside <a> links but keeps href
+         * - Skips emails and URLs
+         * - Handles messy spacing and capitalization
+         * - Prevents infinite recursion when called via ACF
+         */
+        function fix_site_name_text( $content ) {
+            static $running = false;
+            if ( $running ) {
+                return $content; // prevent recursion
+            }
+            $running = true;
+
+            if ( ! is_string( $content ) ) {
+                $running = false;
+                return $content;
+            }
+
+            // Get the site name dynamically
+            $site_name = get_bloginfo('name') ?: get_field('site_name', 'option') ?: '';
+
+            if ( empty( $site_name ) ) {
+                $running = false;
+                return $content;
+            }
+
+            // Escape regex special characters
+            $escaped_site_name = preg_quote( $site_name, '/' );
+
+            // Allow messy spacing between words
+            $pattern_site_name = preg_replace('/\s+/', '\s+', $escaped_site_name);
+
+            // Regex: links, emails, URLs, or variations of site name
+            $pattern = '/
+                (<a\s[^>]*>)(.*?)(<\/a>)      # 1. links
+                |
+                ([\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}) # 2. emails
+                |
+                ((?:https?:\/\/|www\.)[^\s<]+)  # 3. URLs
+                |
+                (' . $pattern_site_name . ')      # 4. messy site name
+            /iusx';
+
+            $content = preg_replace_callback(
+                $pattern,
+                function ( $matches ) use ( $site_name ) {
+                    // Link → replace only the text inside <a>
+                    if ( ! empty( $matches[1] ) && isset( $matches[2] ) ) {
+                        $link_text = preg_replace(
+                            '/\b' . preg_quote($site_name, '/') . '\b/iu',
+                            $site_name,
+                            $matches[2]
+                        );
+                        return $matches[1] . $link_text . $matches[3];
+                    }
+                    // Email → skip
+                    if ( ! empty( $matches[4] ) ) {
+                        return $matches[4];
+                    }
+                    // URL → skip
+                    if ( ! empty( $matches[5] ) ) {
+                        return $matches[5];
+                    }
+                    // Plain text → replace
+                    if ( ! empty( $matches[6] ) ) {
+                        return $site_name;
+                    }
+                    return $matches[0];
+                },
+                $content
+            );
+
+            $running = false;
+            return $content;
+        }
+
+        // Apply to WordPress filters
+        add_filter( 'the_content', 'fix_site_name_text', 20 );
+        add_filter( 'get_the_excerpt', 'fix_site_name_text', 20 );
+        add_filter( 'term_description', 'fix_site_name_text', 20 );
+        add_filter( 'widget_text', 'fix_site_name_text', 20 );
+        add_filter( 'acf/format_value', 'fix_site_name_text', 20 );
+        add_filter( 'acf/format_value/type=wysiwyg', 'fix_site_name_text', 20 );
+    }

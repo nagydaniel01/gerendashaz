@@ -18,56 +18,48 @@
         $categories = [];
     }
 
-    $extra_classes = '';
+    $classes = 'card';
     if ($post_type) {
-        $extra_classes = ' card--'.$post_type;
+        $classes .= ' card--' . $post_type;
     }
 ?>
 
-<article id="<?php echo esc_attr($post_id); ?>" class="card<?php echo esc_attr($extra_classes); ?>" data-aos="fade-up">
-    <a href="<?php the_permalink(); ?>" class="card__link">
-        <?php if ($image_id) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <?php echo wp_get_attachment_image($image_id, 'medium_large', false, ['class' => 'card__image', 'alt' => esc_attr($alt_text), 'loading' => 'lazy']); ?>
-                </div>
-            </div>
-        <?php elseif ( defined( 'PLACEHOLDER_IMG_SRC' ) && PLACEHOLDER_IMG_SRC ) : ?>
-            <div class="card__header">
-                <div class="card__image-wrapper">
-                    <img width="150" height="150" src="<?php echo esc_url( PLACEHOLDER_IMG_SRC ); ?>" alt="" class="card__image card__image--placeholder" loading="lazy">
-                </div>
-            </div>
-        <?php endif; ?>
+<?php do_action('theme_card_open', [
+    'post_id' => $post_id,
+    'classes' => $classes
+]); ?>
 
-        <div class="card__content">
-            <h3 class="card__title"><?php the_title(); ?></h3>
-            
-            <div class="card__lead"><?php the_excerpt(); ?></div>
+    <?php do_action('theme_card_link_open', ['post_id' => $post_id]); ?>
 
-            <?php if (!empty($categories) && is_array($categories)) : ?>
-                <div class="card__meta">
-                    <span class="card__categories">
-                        <?php
-                            $primary_category = '';
+        <?php
+        do_action('theme_card_header', [
+            'image_id' => $image_id,
+            'alt_text' => $alt_text
+        ]);
+        ?>
 
-                            if (function_exists('get_rank_math_primary_term_name')) {
-                                $primary_category = get_rank_math_primary_term_name(null, 'category');
-                            }
+        <?php do_action('theme_card_content_open'); ?>
 
-                            if (empty($primary_category) && !empty($categories[0]) && isset($categories[0]->name)) {
-                                $primary_category = $categories[0]->name;
-                            }
-                        ?>
+            <?php
+            do_action('theme_card_title', [
+                'card_title' => $title
+            ]);
 
-                        <?php if (!empty($primary_category)) : ?>
-                            <span class="card__category"><?php echo esc_html($primary_category); ?></span>
-                        <?php endif; ?>
-                    </span>
-                </div>
-            <?php endif; ?>
+            do_action('theme_card_description', [
+                'card_description' => get_the_excerpt()
+            ]);
+
+            do_action('theme_card_meta', [
+                'post_id' => $post_id,
+                'show_category' => true,
+                'show_date'     => false,
+            ]);
+            ?>
 
             <button type="button" class="btn btn-primary card__button"><?php echo esc_html__('Book now', 'gerendashaz'); ?></button>
-        </div>
-    </a>
-</article>
+
+        <?php do_action('theme_card_content_close'); ?>
+
+    <?php do_action('theme_card_link_close'); ?>
+
+<?php do_action('theme_card_close'); ?>

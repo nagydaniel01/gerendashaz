@@ -2,28 +2,183 @@
     if ( ! defined( 'ABSPATH' ) ) {
         exit; // Exit if accessed directly
     }
-    
-    if ( ! function_exists( 'move_comment_field' ) ) {
+
+        if ( ! function_exists( 'wp_dequeue_unwanted_styles' ) ) {
         /**
-         * Moves the comment textarea to the bottom of the comment form fields.
+         * Dequeue unwanted frontend styles to reduce CSS bloat.
          *
-         * This function reorders the fields in the WordPress comment form
-         * so that the comment textarea appears after other fields like
-         * name, email, and website.
-         *
-         * @param array $fields An array of comment form fields.
-         * @return array Modified array of comment form fields with comment at the end.
+         * This removes default Gutenberg, WooCommerce, and global theme styles.
          */
-        function move_comment_field( $fields ) {
-            if ( isset( $fields['comment'] ) ) {
-                $comment_field = $fields['comment'];
-                unset( $fields['comment'] );
-                $fields['comment'] = $comment_field;
+        function wp_dequeue_unwanted_styles() {
+            if ( is_admin() ) {
+                return;
             }
-            return $fields;
+
+            // Classic/global styles
+            wp_dequeue_style( 'classic-theme-styles' );
+            wp_dequeue_style( 'global-styles' );
+
+            // Gutenberg block styles
+            wp_dequeue_style( 'wp-block-library' );
+            wp_dequeue_style( 'wp-block-library-theme' );
+
+            // WooCommerce blocks
+            wp_dequeue_style( 'wc-block-style' );
         }
-        add_filter( 'comment_form_fields', 'move_comment_field' );
+        add_action( 'wp_enqueue_scripts', 'wp_dequeue_unwanted_styles', 100 );
     }
+
+    if ( ! function_exists( 'add_jquery_by_cdn' ) ) {
+        /**
+         * Register and enqueue jQuery from Google's CDN in the footer.
+         *
+         * This function deregisters the default WordPress jQuery script and
+         * registers a new one from Google's CDN, using the jQuery version
+         * currently registered in WordPress core (or a default fallback).
+         * The script is loaded in the footer for better page load performance.
+         *
+         * This runs only on the frontend, not in admin pages.
+         *
+         * @return void
+         */
+        function add_jquery_by_cdn() {
+            // Only modify scripts on the frontend
+            if ( is_admin() ) {
+                return;
+            }
+
+            global $wp_scripts;
+
+            // Ensure $wp_scripts is initialized and is an instance of WP_Scripts
+            if ( ! ( $wp_scripts instanceof WP_Scripts ) ) {
+                return;
+            }
+
+            // Default jQuery version fallback
+            $default_version = '3.7.1';
+            $jquery_version  = $default_version;
+
+            // Attempt to get jQuery version from 'jquery-core'
+            if ( isset( $wp_scripts->registered['jquery-core'] ) && is_object( $wp_scripts->registered['jquery-core'] ) ) {
+                $core_script = $wp_scripts->registered['jquery-core'];
+
+                if ( isset( $core_script->ver ) && is_string( $core_script->ver ) && preg_match( '/^\d+\.\d+(\.\d+)?$/', $core_script->ver ) ) {
+                    $jquery_version = $core_script->ver;
+                }
+            }
+
+            $protocol       = is_ssl() ? 'https' : 'http';
+            $cdn_url        = "{$protocol}://ajax.googleapis.com/ajax/libs/jquery/{$jquery_version}/jquery.min.js";
+
+            // Deregister jQuery if it's already registered
+            if ( wp_script_is( 'jquery', 'registered' ) ) {
+                wp_deregister_script( 'jquery' );
+            }
+
+            // Register and enqueue the CDN jQuery version in the footer
+            wp_register_script( 'jquery', esc_url( $cdn_url ), [], $jquery_version, true );
+            wp_enqueue_script( 'jquery' );
+        }
+        add_action( 'wp_enqueue_scripts', 'add_jquery_by_cdn', 20 );
+    }
+
+    if ( ! function_exists( 'remove_jquery_migrate' ) ) {
+        /**
+         * Optional: Remove jQuery Migrate if not needed on the front end.
+         *
+         * @param WP_Scripts $scripts The WP_Scripts object.
+         */
+        function remove_jquery_migrate( $scripts ) {
+            if ( ! is_admin() && isset( $scripts->registered['jquery'] ) ) {
+                $script = $scripts->registered['jquery'];
+                if ( $script->deps ) {
+                    $script->deps = array_diff( $script->deps, array( 'jquery-migrate' ) );
+                }
+            }
+        }
+        add_action( 'wp_default_scripts', 'remove_jquery_migrate' );
+    }
+
+    if ( ! function_exists( 'add_defer_to_scripts' ) ) {
+        /**
+         * Adds the 'defer' attribute to script tags for non-logged-in users, excluding jQuery.
+         *
+         * @param string $tag The HTML script tag.
+         * @param string $handle The script's registered handle.
+         * @param string $src The script source URL.
+         * @return string Modified script tag with 'defer' attribute if appropriate.
+         */
+        function add_defer_to_scripts( $tag, $handle, $src ) {
+            // Only apply for non-logged-in users
+            if ( is_user_logged_in() ) {
+                return $tag;
+            }
+
+            // Skip jQuery and any known dependencies that shouldn't be deferred
+            $excluded_handles = array(
+                'jquery',
+                'jquery-core',
+                'jquery-migrate',
+            );
+
+            if ( in_array( $handle, $excluded_handles, true ) ) {
+                return $tag;
+            }
+
+            // Ensure the tag contains a JS file
+            if ( strpos( $src, '.js' ) === false ) {
+                return $tag;
+            }
+
+            // Add 'defer' if not already present
+            if ( false === strpos( $tag, ' defer' ) ) {
+                $tag = str_replace( '<script ', '<script defer ', $tag );
+            }
+
+            return $tag;
+        }
+
+        //add_filter( 'script_loader_tag', 'add_defer_to_scripts', 10, 3 );
+    }
+
+    //add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
+    add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
+
+    // ============================================================
+    // SEARCH URL REWRITE
+    // ============================================================
+
+    if ( ! function_exists( 'wp_redirect_raw_search' ) ) {
+        /**
+         * Redirect old query string search URLs (?s=query) to the new /kereses/query format.
+         */
+        function wp_redirect_raw_search() {
+            if ( is_search() && ! empty( $_GET['s'] ) ) {
+                $search_query = get_query_var( 's' );
+                $redirect_url = home_url( '/kereses/' . urlencode( $search_query ) );
+                wp_redirect( $redirect_url, 301 ); // Permanent redirect
+                exit();
+            }
+        }
+        add_action( 'template_redirect', 'wp_redirect_raw_search' );
+    }
+
+    if ( ! function_exists( 'wp_change_search_base' ) ) {
+        /**
+         * Change the default search base from /search/ to /kereses/
+         * and flush rewrite rules once.
+         */
+        function wp_change_search_base() {
+            global $wp_rewrite;
+            $wp_rewrite->search_base = 'kereses';
+            $wp_rewrite->flush_rules( false ); // flush rules safely without deleting .htaccess
+        }
+        add_action( 'init', 'wp_change_search_base' );
+    }
+
+    // ============================================================
+    // TERM META: CREATION & MODIFIED DATES
+    // ============================================================
 
     if ( ! function_exists( 'save_term_date' ) ) {
         /**
@@ -93,6 +248,32 @@
             
             return ! empty( $modified_date ) ? $modified_date : '';
         }
+    }
+
+    // ============================================================
+    // COMMENT FORM CUSTOMIZATIONS
+    // ============================================================
+
+    if ( ! function_exists( 'move_comment_field' ) ) {
+        /**
+         * Moves the comment textarea to the bottom of the comment form fields.
+         *
+         * This function reorders the fields in the WordPress comment form
+         * so that the comment textarea appears after other fields like
+         * name, email, and website.
+         *
+         * @param array $fields An array of comment form fields.
+         * @return array Modified array of comment form fields with comment at the end.
+         */
+        function move_comment_field( $fields ) {
+            if ( isset( $fields['comment'] ) ) {
+                $comment_field = $fields['comment'];
+                unset( $fields['comment'] );
+                $fields['comment'] = $comment_field;
+            }
+            return $fields;
+        }
+        add_filter( 'comment_form_fields', 'move_comment_field' );
     }
 
     if ( ! function_exists( 'comment_rating_rating_field' ) ) {
@@ -264,57 +445,4 @@
             return $custom_content;
         }
         add_shortcode( 'average_rating', 'average_rating_shortcode' );
-    }
-
-    if ( ! function_exists( 'open_external_links_in_new_tab' ) ) {
-        /**
-         * Open External Links in a New Tab
-         *
-         * This function scans post content and modifies all external links
-         * so that they open in a new browser tab with proper security attributes.
-         *
-         * It is applied to both regular post content and ACF WYSIWYG fields.
-         *
-         * @param string $content The post content or ACF WYSIWYG field value.
-         * @return string Modified content with external links opening in a new tab.
-         */
-        function open_external_links_in_new_tab( $content ) {
-            // Ensure content is a string to avoid errors
-            if (!is_string( $content ) || trim( $content ) === '') {
-                return $content;
-            }
-
-            // Get the site's base URL
-            $site_url = get_home_url();
-
-            // Use preg_replace_callback safely to find anchor tags
-            $modified_content = @preg_replace_callback(
-                '/<a\s+([^>]*?)href=["\'](https?:\/\/[^"\']+)["\']([^>]*)>/i',
-                function ($matches) use ($site_url) {
-                    $before = $matches[1];
-                    $link   = trim($matches[2]);
-                    $after  = $matches[3];
-
-                    // Skip internal links (including subpages)
-                    if (strpos($link, $site_url) === 0) {
-                        return '<a ' . $before . 'href="' . esc_url($link) . '"' . $after . '>';
-                    }
-
-                    // Add target and rel attributes safely for external links
-                    $new_tag = '<a ' . $before . 'href="' . esc_url($link) . '" target="_blank" rel="noopener noreferrer"' . $after . '>';
-                    return $new_tag;
-                },
-                $content
-            );
-
-            // If regex fails, fall back to the original content
-            if ($modified_content === null) {
-                return $content;
-            }
-
-            return $modified_content;
-        }
-        add_filter( 'the_content', 'open_external_links_in_new_tab' );
-        add_filter( 'acf/format_value/type=wysiwyg', 'open_external_links_in_new_tab' );
-        add_filter( 'acf/format_value/type=textarea', 'open_external_links_in_new_tab' );
     }
