@@ -77,7 +77,13 @@
                 // Determine flag URL
                 $custom_flag_file = get_template_directory() . "/assets/src/svg/flags/{$slug}.svg";
                 $custom_flag_url  = get_template_directory_uri() . "/assets/src/svg/flags/{$slug}.svg";
+
                 $flag_url         = file_exists( $custom_flag_file ) ? $custom_flag_url : ( $flag ?: '' );
+
+                // Force HTTPS if site uses SSL
+                if ( is_ssl() && $flag_url ) {
+                    $flag_url = preg_replace( '/^http:/i', 'https:', $flag_url );
+                }
 
                 // Output list item
                 printf(

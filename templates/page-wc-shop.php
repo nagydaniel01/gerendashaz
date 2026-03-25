@@ -1,12 +1,22 @@
 <?php 
-/** 
+/**
  * Template Name: Custom WooCommerce Shop Template
+ * Description: A custom template for displaying the WooCommerce shop page with custom layout or functionality.
  */
-?>
 
-<?php
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( 'WooCommerce' ) ) {
+    wp_die(
+        esc_html__( 'WooCommerce is not active. Please activate WooCommerce to access this page.', 'your-text-domain' ),
+        esc_html__( 'WooCommerce Required', 'your-text-domain' ),
+        [
+            'response'  => 403,
+            'back_link' => true,
+        ]
+    );
 }
 
 if ( ! class_exists( 'WC_Product_Query' ) ) {

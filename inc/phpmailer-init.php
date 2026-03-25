@@ -20,7 +20,7 @@
             $phpmailer->Password   = '4be51df465bc15';
         }
         // Uncomment to activate Mailtrap config
-        add_action( 'phpmailer_init', 'mailtrap' );
+        //add_action( 'phpmailer_init', 'mailtrap' );
     }
 
     if ( ! function_exists( 'cpanel_mail' ) ) {
@@ -40,11 +40,11 @@
             $phpmailer->Port       = 465;                   // Use 465 for SSL, 587 for TLS
             $phpmailer->SMTPSecure = 'ssl';                 // 'ssl' or 'tls'
             $phpmailer->Username   = 'hello@gerendashaz.hu';  // Your cPanel email address
-            $phpmailer->Password   = 'Timike1986@.';        // Your email password
+            $phpmailer->Password   = 'F{U]Swg3m[lR]4EV';        // Your email password
             $phpmailer->From       = 'hello@gerendashaz.hu';  // Optional: set From address
-            $phpmailer->FromName   = 'gerendashaz';           // Optional: set From name
+            $phpmailer->FromName   = 'Gerendás Vendégház';           // Optional: set From name
         }
-        //add_action( 'phpmailer_init', 'cpanel_mail' );
+        add_action( 'phpmailer_init', 'cpanel_mail' );
     }
 
     if ( ! function_exists( 'log_mailer_errors' ) ) {

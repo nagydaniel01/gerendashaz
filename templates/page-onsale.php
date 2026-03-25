@@ -1,12 +1,22 @@
 <?php
 /**
  * Template Name: On Sale Page
+ * Description: Displays all WooCommerce products that are currently on sale.
  */
-?>
 
-<?php
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( 'WooCommerce' ) ) {
+    wp_die(
+        esc_html__( 'WooCommerce is not active. Please activate WooCommerce to access this page.', 'your-text-domain' ),
+        esc_html__( 'WooCommerce Required', 'your-text-domain' ),
+        [
+            'response'  => 403,
+            'back_link' => true,
+        ]
+    );
 }
 
 if ( ! class_exists( 'WC_Product_Query' ) ) {

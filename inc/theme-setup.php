@@ -286,7 +286,8 @@
 
     if ( ! function_exists( 'theme_body_classes' ) ) {
         /**
-         * Modifies the body_class output to remove unwanted classes.
+         * Modifies the body_class output to remove unwanted classes
+         * and add 'woocommerce' class only on non-WooCommerce pages.
          *
          * @param array $classes The current body classes.
          * @return array Modified body classes.
@@ -296,24 +297,12 @@
             if ( ( $key = array_search( 'page', $classes ) ) !== false ) {
                 unset( $classes[ $key ] );
             }
-        
-            // Add a custom class
-            //$classes[] = 'my-custom-class';
 
-            $is_woocommerce_page = false;
-
-            // Only check WooCommerce conditions if plugin is active
-            if ( class_exists( 'WooCommerce' ) ) {
-                if ( is_woocommerce() ) {
-                    $is_woocommerce_page = true;
-                }
-            }
-
-            // If not a WooCommerce page, add the 'woocommerce' class
-            if ( ! $is_woocommerce_page && ! in_array( 'woocommerce', $classes, true ) ) {
+            // Only add 'woocommerce' class if WooCommerce is active AND NOT a WooCommerce page
+            if ( class_exists( 'WooCommerce' ) && ! is_woocommerce() && ! in_array( 'woocommerce', $classes, true ) ) {
                 $classes[] = 'woocommerce';
             }
-        
+
             return $classes;
         }
         add_filter( 'body_class', 'theme_body_classes' );

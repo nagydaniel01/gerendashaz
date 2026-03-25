@@ -7,7 +7,7 @@
             e.preventDefault();
 
             // Check if privacy checkbox is checked
-            if( !$('#reg_privacy_policy').is(':checked') ){
+            if (!$('#reg_privacy_policy').is(':checked')) {
                 $('#reg_response').html('<div class="alert alert-danger">'+event_registration_form_ajax_object.msg_privacy_required+'</div>');
                 return; // stop submission
             }
@@ -38,13 +38,13 @@
                             $('#reg_response').html('<div class="alert alert-info">'+event_registration_form_ajax_object.msg_sending+'</div>');
                         },
 
-                        success: function(response){
+                        success: function(response) {
                             if(response && typeof response === 'object'){
                                 if(response.success){
                                     var message = response.data && response.data.message ? response.data.message : event_registration_form_ajax_object.msg_success;
                                     $('#reg_response').html('<div class="alert alert-success">'+message+'</div>');
 
-                                    if(response.data.redirect_url){
+                                    if (response.data.redirect_url) {
                                         // Grab values from response
                                         var attendee_id = response.data.attendee_id ? response.data.attendee_id : '';
 
@@ -64,11 +64,11 @@
                             }
                         },
 
-                        error: function(xhr, status, error){
+                        error: function(xhr, status, error) {
                             var errMsg = event_registration_form_ajax_object.msg_network_error;
-                            if(xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message){
+                            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
                                 errMsg = xhr.responseJSON.data.message;
-                            } else if(error){
+                            } else if (error) {
                                 errMsg += ' (' + error + ')';
                             }
                             $('#reg_response').html('<div class="alert alert-danger">'+errMsg+'</div>');

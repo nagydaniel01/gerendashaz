@@ -1,7 +1,12 @@
 <?php 
 /**
  * Template Name: Flexibile Elements Template
+ * Description: Template for rendering flexible content elements using ACF flexible fields.
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
 ?>
 
 <?php get_header(); ?>

@@ -145,7 +145,7 @@
                 $choices = [];
             }
 
-            $choices[ __( 'Other', 'gerendashaz' ) ]['wc_prod_attr'] = __( 'WC Product Attribute', 'gerendashaz' );
+            $choices[ __( 'WooCommerce', 'gerendashaz' ) ]['wc_prod_attr'] = __( 'WC Product Attribute', 'gerendashaz' );
 
             return $choices;
         }
@@ -207,6 +207,134 @@
             return (bool) $match;
         }
         add_filter( 'acf/location/rule_match/wc_prod_attr', 'acf_match_wc_prod_attr_rule', 10, 3 );
+    }
+
+    if ( ! function_exists( 'acf_add_wc_prod_type_rule_type' ) ) {
+        /**
+         * Add a custom rule type for WooCommerce product type.
+         */
+        function acf_add_wc_prod_type_rule_type( $choices ) {
+            if ( ! is_array( $choices ) ) {
+                $choices = [];
+            }
+
+            $choices[ __( 'WooCommerce', 'gerendashaz' ) ]['wc_prod_type'] = __( 'WC Product Type', 'gerendashaz' );
+            return $choices;
+        }
+        add_filter( 'acf/location/rule_types', 'acf_add_wc_prod_type_rule_type' );
+    }
+
+    if ( ! function_exists( 'acf_add_wc_prod_type_rule_values' ) ) {
+        /**
+         * Add values for WC product types (simple, variable, etc.)
+         */
+        function acf_add_wc_prod_type_rule_values( $choices ) {
+            $choices = [
+                'simple'   => __( 'Simple', 'gerendashaz' ),
+                'variable' => __( 'Variable', 'gerendashaz' ),
+                'grouped'  => __( 'Grouped', 'gerendashaz' ),
+                'external' => __( 'External/Affiliate', 'gerendashaz' ),
+            ];
+            return $choices;
+        }
+        add_filter( 'acf/location/rule_values/wc_prod_type', 'acf_add_wc_prod_type_rule_values' );
+    }
+
+    if ( ! function_exists( 'acf_match_wc_prod_type_rule' ) ) {
+        /**
+         * Match the ACF rule against the product type.
+         */
+        function acf_match_wc_prod_type_rule( $match, $rule, $options ) {
+            if ( empty( $options['post_id'] ) || empty( $rule['value'] ) ) {
+                return $match;
+            }
+
+            $post_id = $options['post_id'];
+            $product = wc_get_product( $post_id );
+
+            if ( ! $product ) {
+                return false;
+            }
+
+            $prod_type = $product->get_type();
+
+            // Match operator
+            if ( '==' === $rule['operator'] ) {
+                $match = ( $prod_type === $rule['value'] );
+            } elseif ( '!=' === $rule['operator'] ) {
+                $match = ( $prod_type !== $rule['value'] );
+            }
+
+            return $match;
+        }
+        add_filter( 'acf/location/rule_match/wc_prod_type', 'acf_match_wc_prod_type_rule', 10, 3 );
+    }
+
+    if ( ! function_exists( 'acf_add_wc_prod_cat_rule_type' ) ) {
+        /**
+         * Add a custom rule type for WooCommerce product categories.
+         */
+        function acf_add_wc_prod_cat_rule_type( $choices ) {
+            if ( ! is_array( $choices ) ) {
+                $choices = [];
+            }
+
+            $choices[ __( 'WooCommerce', 'gerendashaz' ) ]['wc_prod_cat'] = __( 'WC Product Category', 'gerendashaz' );
+            return $choices;
+        }
+        add_filter( 'acf/location/rule_types', 'acf_add_wc_prod_cat_rule_type' );
+    }
+
+    if ( ! function_exists( 'acf_add_wc_prod_cat_rule_values' ) ) {
+        /**
+         * Add all WooCommerce product categories as rule values.
+         */
+        function acf_add_wc_prod_cat_rule_values( $choices ) {
+            $terms = get_terms( [
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => false,
+            ] );
+
+            if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                foreach ( $terms as $term ) {
+                    $choices[ $term->slug ] = $term->name;
+                }
+            }
+
+            return $choices;
+        }
+        add_filter( 'acf/location/rule_values/wc_prod_cat', 'acf_add_wc_prod_cat_rule_values' );
+    }
+
+    if ( ! function_exists( 'acf_match_wc_prod_cat_rule' ) ) {
+        /**
+         * Match ACF fields based on selected product category.
+         */
+        function acf_match_wc_prod_cat_rule( $match, $rule, $options ) {
+            if ( empty( $options['post_id'] ) || empty( $rule['value'] ) ) {
+                return $match;
+            }
+
+            $post_id = $options['post_id'];
+            $product_terms = wp_get_post_terms( $post_id, 'product_cat', [ 'fields' => 'slugs' ] );
+
+            if ( is_wp_error( $product_terms ) ) {
+                return false;
+            }
+
+            if ( ! is_array( $product_terms ) ) {
+                return false;
+            }
+
+            if ( '==' === $rule['operator'] ) {
+                $match = in_array( $rule['value'], $product_terms );
+            } elseif ( '!=' === $rule['operator'] ) {
+                $match = ! in_array( $rule['value'], $product_terms );
+            }
+
+            return $match;
+        }
+        add_filter( 'acf/location/rule_match/wc_prod_cat', 'acf_match_wc_prod_cat_rule', 10, 3 );
     }
 
     if ( ! function_exists( 'my_acf_google_map_api' ) ) {

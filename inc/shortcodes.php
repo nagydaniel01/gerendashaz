@@ -36,7 +36,7 @@
             if ( ! class_exists( 'WooCommerce' ) ) return '';
 
             if ( is_user_logged_in() ) {
-                return wpautop( esc_html__( 'You are already registered.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'You are already registered.', 'nagyigen2026' ) );
             }
 
             ob_start();
@@ -46,7 +46,7 @@
             $html = wc_get_template_html( 'myaccount/form-login.php' );
 
             if ( empty( $html ) ) {
-                return wpautop( esc_html__( 'Registration form not available.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'Registration form not available.', 'nagyigen2026' ) );
             }
 
             libxml_use_internal_errors( true );
@@ -62,7 +62,7 @@
             libxml_clear_errors();
 
             if ( ! $loaded ) {
-                return wpautop( esc_html__( 'Error loading registration form.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'Error loading registration form.', 'nagyigen2026' ) );
             }
 
             $xpath = new DOMXPath( $dom );
@@ -72,7 +72,7 @@
             if ( $form ) {
                 echo $dom->saveHTML( $form );
             } else {
-                echo wpautop( esc_html__( 'Registration form not found.', 'gerendashaz' ) );
+                echo wpautop( esc_html__( 'Registration form not found.', 'nagyigen2026' ) );
             }
 
             return ob_get_clean();
@@ -94,7 +94,7 @@
             if ( ! class_exists( 'WooCommerce' ) ) return '';
 
             if ( is_user_logged_in() ) {
-                return wpautop( esc_html__( 'You are already logged in.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'You are already logged in.', 'nagyigen2026' ) );
             }
 
             ob_start();
@@ -333,6 +333,132 @@
         add_shortcode( 'site_email', 'site_email_shortcode' );
     }
 
+    if ( ! function_exists( 'address_link_shortcode' ) ) {
+        /**
+         * Shortcode handler for generating location links with SVG icons.
+         *
+         * Usage:
+         * [address_link address="Budapest, Hungary"]
+         * [address_link address="Budapest, Hungary" type="route"]
+         * [address_link address="Budapest, Hungary" provider="waze"]
+         * [address_link address="Budapest, Hungary" title="View Map" icon="icon-paper-plane"]
+         *
+         * @param array $atts Shortcode attributes.
+         * @return string HTML anchor tag or raw URL.
+         */
+        function address_link_shortcode( $atts ) {
+
+            $atts = shortcode_atts(
+                array(
+                    'address'    => '',
+                    'type'       => 'map',
+                    'provider'   => 'google',
+                    'return_tag' => 'true',
+                    'title'      => '',
+                    'icon'       => '', // SVG icon name (e.g. icon-paper-plane)
+                ),
+                $atts,
+                'address_link'
+            );
+
+            if ( empty( $atts['address'] ) ) {
+                return '';
+            }
+
+            $url = get_address_url( $atts['address'], $atts['type'], $atts['provider'] );
+
+            $text = $atts['title'] ?: $atts['address'];
+            $icon = $atts['icon'] ? get_svg( 'icon-'.$atts['icon'] ) : '';
+
+            // Boolean flag
+            $return_tag = filter_var( $atts['return_tag'], FILTER_VALIDATE_BOOLEAN );
+
+            if ( $return_tag ) {
+                return sprintf(
+                    '<a href="%s" target="_blank" rel="noopener noreferrer" class="btn btn-primary">%s<span>%s</span></a>',
+                    esc_url( $url ),
+                    $icon,
+                    esc_html( $text )
+                );
+            }
+
+            return esc_url( $url );
+        }
+        add_shortcode( 'address_link', 'address_link_shortcode' );
+    }
+
+    if ( ! function_exists( 'add_icon_shortcode' ) ) {
+
+        /**
+         * Register a shortcode to output an SVG icon with optional hidden descriptive text.
+         *
+         * Usage:
+         * [icon name="arrow-right" label="Read more" class="my-icon"]
+         *
+         * @param array $atts Shortcode attributes:
+         *   - name  (string) Required. SVG icon name/ID.
+         *   - label (string) Optional. Screen reader label.
+         *   - class (string) Optional. Wrapper CSS class.
+         *
+         * @return string Rendered HTML or empty string on failure.
+         */
+        function add_icon_shortcode( $atts ): string {
+            $defaults = array(
+                'name'  => '',
+                'label' => '',
+                'class' => 'icon__wrapper',
+            );
+
+            $atts = shortcode_atts( $defaults, $atts, 'icon' );
+
+            // Validate icon name.
+            if ( empty( $atts['name'] ) || ! is_string( $atts['name'] ) ) {
+                return '';
+            }
+
+            // Sanitize values.
+            $icon_name = sanitize_text_field( $atts['name'] );
+            $label     = sanitize_text_field( $atts['label'] );
+            $class     = sanitize_html_class( $atts['class'] );
+
+            if ( empty( $class ) ) {
+                $class = 'icon__wrapper';
+            }
+
+            /**
+             * Generate SVG safely.
+             * Fallback to empty string if function is unavailable.
+             */
+            $svg = function_exists( 'get_svg' )
+                ? get_svg( 'icon-'.$icon_name )
+                : '';
+
+            if ( empty( $svg ) ) {
+                return '';
+            }
+
+            /**
+             * Optional accessible label for screen readers.
+             */
+            $label_markup = '';
+
+            if ( ! empty( $label ) ) {
+                $label_markup = sprintf(
+                    '<span class="screen-reader-text">%s</span>',
+                    esc_html( $label )
+                );
+            }
+
+            return sprintf(
+                '<span class="%s">%s%s</span>',
+                esc_attr( $class ),
+                $svg,
+                $label_markup
+            );
+        }
+        add_shortcode( 'icon', 'add_icon_shortcode' );
+    }
+
     if ( ! function_exists( 'wp_google_map_shortcode' ) ) {
         /**
          * Generates an embeddable Google Map iframe via shortcode.
@@ -402,7 +528,7 @@
          * @param bool   $acf_mode      If true, expects ACF-style array. If false, expects simple array.
          * @param string $text_domain   Text domain for translations.
          */
-        function render_opening_hours_table( $opening_hours, $acf_mode = true, $text_domain = 'gerendashaz' ) {
+        function render_opening_hours_table( $opening_hours, $acf_mode = true, $text_domain = 'nagyigen2026' ) {
 
             // Day labels with translation support
             $days = [
@@ -487,16 +613,16 @@
             if ( should_abort_shortcode() ) return '';
 
             if ( ! function_exists( 'get_field' ) ) {
-                return wpautop( esc_html__( 'ACF plugin is not active.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'ACF plugin is not active.', 'nagyigen2026' ) );
             }
 
             $opening_hours = get_field( 'opening_hours', 'option' );
 
             if ( empty( $opening_hours ) ) {
-                return wpautop( esc_html__( 'No opening hours specified.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'No opening hours specified.', 'nagyigen2026' ) );
             }
 
-            return render_opening_hours_table( $opening_hours, true, 'gerendashaz' );
+            return render_opening_hours_table( $opening_hours, true, 'nagyigen2026' );
         }
         add_shortcode( 'opening_hours', 'opening_hours_shortcode' );
     }
@@ -615,7 +741,7 @@
             ) );
 
             if ( empty( $orders ) ) {
-                return wpautop( esc_html__( 'No feedback yet.', 'gerendashaz' ) );
+                return wpautop( esc_html__( 'No feedback yet.', 'nagyigen2026' ) );
             }
 
             $output = '<div class="thankyou-feedback-list">';
@@ -662,15 +788,15 @@
                     $output .= '<div class="rating">' . $stars . '</div>';
                 }
                 if ( $like ) {
-                    $output .= '<p><strong>' . esc_html__( 'Opinion:', 'gerendashaz' ) . '</strong> ' . esc_html( $like ) . '</p>';
+                    $output .= '<p><strong>' . esc_html__( 'Opinion:', 'nagyigen2026' ) . '</strong> ' . esc_html( $like ) . '</p>';
                 }
                 if ( $feedback ) {
-                    $output .= '<p><strong>' . esc_html__( 'Feedback:', 'gerendashaz' ) . '</strong> ' . esc_html( $feedback ) . '</p>';
+                    $output .= '<p><strong>' . esc_html__( 'Feedback:', 'nagyigen2026' ) . '</strong> ' . esc_html( $feedback ) . '</p>';
                 }
                 if ( $date ) {
                     $output .= '<p class="date">' . sprintf(
                         /* translators: %s = feedback date */
-                        esc_html__( 'Submitted on %s', 'gerendashaz' ),
+                        esc_html__( 'Submitted on %s', 'nagyigen2026' ),
                         esc_html( $date )
                     ) . '</p>';
                 }

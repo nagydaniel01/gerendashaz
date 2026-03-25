@@ -7,7 +7,7 @@
             e.preventDefault();
 
             // Check if privacy checkbox is checked
-            if( !$('#mc_privacy_policy').is(':checked') ){
+            if (!$('#mc_privacy_policy').is(':checked')) {
                 $('#mc_response').html('<div class="alert alert-danger">'+mc_form_ajax_object.msg_privacy_required+'</div>');
                 return; // stop submission
             }
@@ -38,9 +38,9 @@
                             $('#mc_response').html('<div class="alert alert-info">'+mc_form_ajax_object.msg_sending+'</div>');
                         },
 
-                        success: function(response){
-                            if(response && typeof response === 'object'){
-                                if(response.success){
+                        success: function(response) {
+                            if (response && typeof response === 'object') {
+                                if (response.success) {
                                     var message = response.data && response.data.message ? response.data.message : mc_form_ajax_object.msg_success;
                                     $('#mc_response').html('<div class="alert alert-success">'+message+'</div>');
                                 } else {
@@ -52,11 +52,11 @@
                             }
                         },
 
-                        error: function(xhr, status, error){
+                        error: function(xhr, status, error) {
                             var errMsg = mc_form_ajax_object.msg_network_error;
-                            if(xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message){
+                            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
                                 errMsg = xhr.responseJSON.data.message;
-                            } else if(error){
+                            } else if (error) {
                                 errMsg += ' (' + error + ')';
                             }
                             $('#mc_response').html('<div class="alert alert-danger">'+errMsg+'</div>');

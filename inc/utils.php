@@ -149,6 +149,164 @@
             return $post_id ? (int) $post_id : null;
         }
     }
+    
+    if ( ! function_exists( 'get_svg' ) ) {
+        /**
+         * Generate an SVG icon markup string.
+         *
+         * Builds an accessible SVG icon with optional title, description,
+         * and fallback markup. Safely handles missing data and avoids runtime errors.
+         *
+         * @param string $icon The icon identifier (used as SVG symbol ID and class).
+         * @param array  $args Optional arguments:
+         *   - title (string) Accessible title.
+         *   - desc (string) Accessible description.
+         *   - fallback (bool) Whether to include fallback markup.
+         *
+         * @return string SVG markup or empty string on failure.
+         */
+        function get_svg( string $icon, array $args = array() ): string {
+
+            // Fail early if icon is invalid.
+            if ( empty( $icon ) || ! is_string( $icon ) ) {
+                return '';
+            }
+
+            // Ensure WordPress helper exists.
+            if ( ! function_exists( 'wp_parse_args' ) ) {
+                return '';
+            }
+
+            $defaults = array(
+                'title'    => '',
+                'desc'     => '',
+                'fallback' => false,
+            );
+
+            $args = wp_parse_args( $args, $defaults );
+
+            // Initialize variables safely.
+            $aria_hidden     = ' aria-hidden="true"';
+            $aria_labelledby = '';
+            $title_markup    = '';
+            $fallback_markup = '';
+
+            /**
+             * Handle accessibility attributes.
+             */
+            if ( ! empty( $args['title'] ) && is_string( $args['title'] ) ) {
+
+                $aria_hidden = '';
+
+                // Generate unique ID safely.
+                $unique_id = function_exists( 'uniqid' ) ? uniqid( 'svg-' ) : 'svg-' . mt_rand();
+
+                $labelledby_ids = array( 'title-' . $unique_id );
+
+                $title_markup = sprintf(
+                    '<title id="title-%1$s">%2$s</title>',
+                    esc_attr( $unique_id ),
+                    esc_html( $args['title'] )
+                );
+
+                if ( ! empty( $args['desc'] ) && is_string( $args['desc'] ) ) {
+                    $labelledby_ids[] = 'desc-' . $unique_id;
+
+                    $title_markup .= sprintf(
+                        '<desc id="desc-%1$s">%2$s</desc>',
+                        esc_attr( $unique_id ),
+                        esc_html( $args['desc'] )
+                    );
+                }
+
+                $aria_labelledby = sprintf(
+                    ' aria-labelledby="%s"',
+                    esc_attr( implode( ' ', array_map( 'sanitize_html_class', $labelledby_ids ) ) )
+                );
+            }
+
+            /**
+             * Fallback markup.
+             */
+            if ( ! empty( $args['fallback'] ) ) {
+                $fallback_markup = sprintf(
+                    '<span class="svg-fallback icon-%s"></span>',
+                    esc_attr( sanitize_html_class( $icon ) )
+                );
+            }
+
+            /**
+             * Build SVG output.
+             * Wrapped in try/catch-like safety via checks to avoid warnings.
+             */
+            $icon_class = esc_attr( sanitize_html_class( $icon ) );
+
+            if ( empty( $icon_class ) ) {
+                return '';
+            }
+
+            return sprintf(
+                '<svg class="icon %1$s" role="img"%2$s%3$s>%4$s<use xlink:href="#%1$s"></use>%5$s</svg>',
+                $icon_class,
+                $aria_hidden,
+                $aria_labelledby,
+                $title_markup,
+                $fallback_markup
+            );
+        }
+    }
+
+    if ( ! function_exists( 'wp_kses_allowed_svg' ) ) {
+        /**
+         * Allow SVG elements in wp_kses_post output.
+         *
+         * Safely extends allowed HTML only when context is 'post'.
+         *
+         * @param array  $allowed Allowed HTML tags and attributes.
+         * @param string $context  Context name.
+         *
+         * @return array Modified allowed HTML tags.
+         */
+        function wp_kses_allowed_svg( array $allowed, string $context ): array {
+
+            if ( 'post' !== $context ) {
+                return $allowed;
+            }
+
+            if ( ! is_array( $allowed ) ) {
+                return $allowed;
+            }
+
+            // Ensure keys exist before modifying.
+            if ( ! isset( $allowed['svg'] ) || ! is_array( $allowed['svg'] ) ) {
+                $allowed['svg'] = array();
+            }
+
+            if ( ! isset( $allowed['use'] ) || ! is_array( $allowed['use'] ) ) {
+                $allowed['use'] = array();
+            }
+
+            $allowed['svg'] = array_merge(
+                $allowed['svg'],
+                array(
+                    'class' => true,
+                    'role'  => true,
+                    'aria-hidden' => true,
+                    'aria-labelledby' => true,
+                )
+            );
+
+            $allowed['use'] = array_merge(
+                $allowed['use'],
+                array(
+                    'xlink:href' => true,
+                )
+            );
+
+            return $allowed;
+        }
+        add_filter( 'wp_kses_allowed_html', 'wp_kses_allowed_svg', 10, 2 );
+    }
 
     if ( ! function_exists( 'wp_safe_format_date' ) ) {
         /**
@@ -397,74 +555,35 @@
         }
     }
 
-    if ( ! function_exists( 'get_add_to_calendar_url' ) ) {
+    if ( ! function_exists( 'get_google_calendar_url' ) ) {
         /**
-         * Generate a Google Calendar event URL from an Event post.
+         * Generate a Google Calendar event URL.
          *
-         * @param int $event_id The event post ID.
-         * @return string Google Calendar URL or empty string if invalid.
+         * @param array $data Manual event data.
+         * @return string
          */
-        function get_add_to_calendar_url( $event_id ) {
-            if ( ! $event_id || ! get_post( $event_id ) ) {
+        function get_google_calendar_url( $data = [] ) {
+
+            // Ensure required fields exist
+            if ( empty( $data['start'] ) || empty( $data['title'] ) ) {
                 return '';
             }
 
-            $summary     = get_the_title( $event_id );
-            $description = get_the_excerpt( $event_id );
-            $location    = get_field( 'event_location', $event_id )['event_location_address'] ?? '';
+            $summary     = $data['title'] ?? '';
+            $description = $data['description'] ?? '';
+            $location    = $data['location'] ?? '';
+            $timezone    = wp_timezone_string();
 
-            $timezone = wp_timezone_string();
-            $tz       = new DateTimeZone( $timezone );
+            $start = ( new DateTime( $data['start'], new DateTimeZone( $timezone ) ) )
+                ->format( 'Ymd\THis' );
 
-            // Start fields
-            $start_date_field = get_field_object( 'event_start_date', $event_id );
-            $start_time_field = get_field_object( 'event_start_time', $event_id );
-
-            // End fields
-            $end_date_field = get_field_object( 'event_end_date', $event_id );
-            $end_time_field = get_field_object( 'event_end_time', $event_id );
-
-            if ( empty( $start_date_field['value'] ) || empty( $start_time_field['value'] ) ) {
-                return '';
-            }
-
-            // Start DateTime
-            $start_date = DateTime::createFromFormat(
-                $start_date_field['return_format'] ?? 'Y-m-d',
-                $start_date_field['value'],
-                $tz
-            );
-            if ( ! $start_date ) {
-                return '';
-            }
-
-            [$hour, $minute] = explode( ':', $start_time_field['value'] );
-            $start_date->setTime( (int) $hour, (int) $minute );
-            $start = $start_date->format( 'Ymd\THis' );
-
-            // End DateTime
-            if ( ! empty( $end_date_field['value'] ) ) {
-                $end_date = DateTime::createFromFormat(
-                    $end_date_field['return_format'] ?? 'Y-m-d',
-                    $end_date_field['value'],
-                    $tz
-                );
-                if ( $end_date ) {
-                    if ( ! empty( $end_time_field['value'] ) ) {
-                        [$end_hour, $end_minute] = explode( ':', $end_time_field['value'] );
-                        $end_date->setTime( (int) $end_hour, (int) $end_minute );
-                    } else {
-                        $end_date->setTime( (int) $hour, (int) $minute );
-                    }
-                    $end = $end_date->format( 'Ymd\THis' );
-                }
-            }
-
-            // Default fallback (+1h)
-            if ( empty( $end ) ) {
-                $end = clone $start_date;
-                $end->modify( '+1 hour' );
-                $end = $end->format( 'Ymd\THis' );
+            if ( ! empty( $data['end'] ) ) {
+                $end = ( new DateTime( $data['end'], new DateTimeZone( $timezone ) ) )
+                    ->format( 'Ymd\THis' );
+            } else {
+                $end = ( new DateTime( $data['start'], new DateTimeZone( $timezone ) ) )
+                    ->modify( '+1 hour' )
+                    ->format( 'Ymd\THis' );
             }
 
             $calendar_url  = 'https://www.google.com/calendar/render?action=TEMPLATE';
@@ -478,155 +597,162 @@
         }
     }
 
-    if ( ! function_exists( 'get_add_to_calendar_ics' ) ) {
+    if ( ! function_exists( 'generate_ics_content' ) ) {
         /**
-         * Generate an ICS file content for Apple / Outlook Calendar.
+         * Generate ICS calendar file content from event data.
          *
-         * @param int $event_id The event post ID.
-         * @return string Download URL for the ICS file or empty string if invalid.
+         * Converts event start/end times to UTC and formats them
+         * according to the iCalendar (.ics) specification.
+         *
+         * @param array $event {
+         *     Event data.
+         *
+         *     @type string $title       Event title.
+         *     @type string $description  Event description.
+         *     @type string $location     Event location.
+         *     @type string $start       Event start datetime (Y-m-d H:i:s).
+         *     @type string $end         Optional. Event end datetime (Y-m-d H:i:s).
+         * }
+         *
+         * @return string ICS file content. Empty string if invalid.
          */
-        function get_add_to_calendar_ics( $event_id ) {
-            if ( ! $event_id || ! get_post( $event_id ) ) {
-                return '';
-            }
-
-            $summary     = get_the_title( $event_id );
-            $description = get_the_excerpt( $event_id );
-            $location    = get_field( 'event_location', $event_id )['event_location_address'] ?? '';
-
+        function generate_ics_content( $event ) {
             $timezone = wp_timezone_string();
-            $tz       = new DateTimeZone( $timezone );
 
-            // Start fields
-            $start_date_field = get_field_object( 'event_start_date', $event_id );
-            $start_time_field = get_field_object( 'event_start_time', $event_id );
-
-            // End fields
-            $end_date_field = get_field_object( 'event_end_date', $event_id );
-            $end_time_field = get_field_object( 'event_end_time', $event_id );
-
-            if ( empty( $start_date_field['value'] ) || empty( $start_time_field['value'] ) ) {
+            if ( empty( $event['start'] ) ) {
                 return '';
             }
 
-            // Start DateTime
-            $start_date = DateTime::createFromFormat(
-                $start_date_field['return_format'] ?? 'Y-m-d',
-                $start_date_field['value'],
-                $tz
-            );
-            if ( ! $start_date ) {
-                return '';
-            }
+            // Convert to DateTime objects in site timezone
+            $start_dt = new DateTime( $event['start'], new DateTimeZone( $timezone ) );
 
-            [$hour, $minute] = explode( ':', $start_time_field['value'] );
-            $start_date->setTime( (int) $hour, (int) $minute );
-            $start = $start_date->format( 'Ymd\THis' );
+            $end_dt = ! empty( $event['end'] )
+                ? new DateTime( $event['end'], new DateTimeZone( $timezone ) )
+                : ( clone $start_dt )->modify( '+1 hour' );
 
-            // End DateTime
-            if ( ! empty( $end_date_field['value'] ) ) {
-                $end_date = DateTime::createFromFormat(
-                    $end_date_field['return_format'] ?? 'Y-m-d',
-                    $end_date_field['value'],
-                    $tz
-                );
-                if ( $end_date ) {
-                    if ( ! empty( $end_time_field['value'] ) ) {
-                        [$end_hour, $end_minute] = explode( ':', $end_time_field['value'] );
-                        $end_date->setTime( (int) $end_hour, (int) $end_minute );
-                    } else {
-                        $end_date->setTime( (int) $hour, (int) $minute );
-                    }
-                    $end = $end_date->format( 'Ymd\THis' );
-                }
-            }
+            // Convert to UTC (recommended for ICS compatibility)
+            $start = $start_dt->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Ymd\THis\Z' );
+            $end   = $end_dt->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Ymd\THis\Z' );
 
-            // Default fallback (+1h)
-            if ( empty( $end ) ) {
-                $end = clone $start_date;
-                $end->modify( '+1 hour' );
-                $end = $end->format( 'Ymd\THis' );
-            }
+            // Escape line breaks for ICS format
+            $summary     = str_replace( ["\r\n", "\n"], "\\n", $event['title'] ?? '' );
+            $description = str_replace( ["\r\n", "\n"], "\\n", $event['description'] ?? '' );
+            $location    = str_replace( ["\r\n", "\n"], "\\n", $event['location'] ?? '' );
+
+            // Generate stable UID
+            $uid = md5( $summary . $start ) . '@yoursite.com';
 
             // Build ICS content
             $ics  = "BEGIN:VCALENDAR\r\n";
             $ics .= "VERSION:2.0\r\n";
             $ics .= "PRODID:-//YourSite//NONSGML v1.0//EN\r\n";
             $ics .= "BEGIN:VEVENT\r\n";
-            $ics .= "UID:" . uniqid() . "@yoursite.com\r\n";
+            $ics .= "UID:{$uid}\r\n";
             $ics .= "DTSTAMP:" . gmdate( 'Ymd\THis\Z' ) . "\r\n";
-            $ics .= "DTSTART;TZID={$timezone}:" . $start . "\r\n";
-            $ics .= "DTEND;TZID={$timezone}:" . $end . "\r\n";
-            $ics .= "SUMMARY:" . esc_html( $summary ) . "\r\n";
-            $ics .= "DESCRIPTION:" . esc_html( $description ) . "\r\n";
-            $ics .= "LOCATION:" . esc_html( $location ) . "\r\n";
+            $ics .= "DTSTART:{$start}\r\n";
+            $ics .= "DTEND:{$end}\r\n";
+            $ics .= "SUMMARY:{$summary}\r\n";
+            $ics .= "DESCRIPTION:{$description}\r\n";
+            $ics .= "LOCATION:{$location}\r\n";
             $ics .= "END:VEVENT\r\n";
             $ics .= "END:VCALENDAR\r\n";
 
-            // Save file in uploads/ics
-            $upload_dir = wp_upload_dir();
-            $ics_dir    = trailingslashit( $upload_dir['basedir'] ) . 'ics/';
-            $ics_url    = trailingslashit( $upload_dir['baseurl'] ) . 'ics/';
-            if ( ! file_exists( $ics_dir ) ) {
-                wp_mkdir_p( $ics_dir );
-            }
-
-            $file_name = 'event-' . $event_id . '.ics';
-            file_put_contents( $ics_dir . $file_name, $ics );
-
-            return esc_url( $ics_url . $file_name );
+            return $ics;
         }
     }
 
-    if ( ! function_exists( 'get_location_link' ) ) {
+    if ( ! function_exists( 'handle_ics_download_request' ) ) {
         /**
-         * Generates a map or route link based on the user's device:
-         * - Google Maps for desktop
-         * - Waze for mobile
+         * Handle ICS file download via query parameter.
+         *
+         * Example URL:
+         * ?download_ics=1&title=...&start=...&end=...
+         *
+         * @return void
+         */
+        function handle_ics_download_request() {
+
+            if ( isset( $_GET['download_ics'] ) ) {
+
+                $event = [
+                    'title'       => sanitize_text_field( $_GET['title'] ?? '' ),
+                    'description' => sanitize_textarea_field( $_GET['description'] ?? '' ),
+                    'location'    => sanitize_text_field( $_GET['location'] ?? '' ),
+                    'start'       => sanitize_text_field( $_GET['start'] ?? '' ),
+                    'end'         => sanitize_text_field( $_GET['end'] ?? '' ),
+                ];
+
+                $ics = generate_ics_content( $event );
+
+                if ( empty( $ics ) ) {
+                    wp_die( 'Invalid event data' );
+                }
+
+                header( 'Content-Type: text/calendar; charset=utf-8' );
+                header( 'Content-Disposition: attachment; filename=event.ics' );
+
+                echo $ics;
+                exit;
+            }
+        }
+        add_action( 'init', 'handle_ics_download_request' );
+    }
+
+    if ( ! function_exists( 'get_ics_download_url' ) ) {
+        /**
+         * Generate a URL that triggers ICS file download.
+         *
+         * @param array $data {
+         *     Event data.
+         *
+         *     @type string $title       Event title.
+         *     @type string $description  Event description.
+         *     @type string $location     Event location.
+         *     @type string $start       Event start datetime.
+         *     @type string $end         Optional event end datetime.
+         * }
+         *
+         * @return string Fully escaped URL for ICS download.
+         */
+        function get_ics_download_url( $data ) {
+
+            return add_query_arg( [
+                'download_ics' => 1,
+                'title'        => rawurlencode( $data['title'] ?? '' ),
+                'description'  => rawurlencode( $data['description'] ?? '' ),
+                'location'     => rawurlencode( $data['location'] ?? '' ),
+                'start'        => $data['start'] ?? '',
+                'end'          => $data['end'] ?? '',
+            ], home_url() );
+        }
+    }
+
+    if ( ! function_exists( 'get_address_url' ) ) {
+        /**
+         * Generates a map or route link.
          *
          * @param string $address The address or destination.
-         * @param string $type 'map' for map link, 'route' for route link. Default is 'map'.
-         * @param bool $returnTag If true, return an HTML anchor tag. If false, return only the URL. Default is true.
-         * @return string URL or HTML anchor tag.
-         *
-         * @example
-         * // Returns a full anchor tag to Google Maps (desktop) or Waze (mobile) for a location
-         * echo get_location_link("1600 Amphitheatre Parkway, Mountain View, CA");
-         *
-         * @example
-         * // Returns just the URL for a location
-         * echo get_location_link("1600 Amphitheatre Parkway, Mountain View, CA", 'map', false);
-         *
-         * @example
-         * // Returns a full anchor tag for a route
-         * echo get_location_link("Times Square, New York, NY", 'route');
-         *
-         * @example
-         * // Returns just the URL for a route
-         * echo get_location_link("Times Square, New York, NY", 'route', false);
+         * @param string $type 'map' or 'route'. Default 'map'.
+         * @param string $provider 'google' or 'waze'. Default 'google'.
+         * @return string URL only.
          */
-        function get_location_link($address, $type = 'map', $returnTag = true) {
+        function get_address_url($address, $type = 'map', $provider = 'google') {
             $encodedAddress = urlencode($address);
-            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            $isMobile = preg_match('/(android|iphone|ipad|ipod|mobile)/i', $userAgent);
 
-            if ($isMobile) {
-                // Mobile device -> Waze
+            if ($provider === 'waze') {
+                // Waze links
                 if ($type === 'route') {
-                    $url = "https://waze.com/ul?q={$encodedAddress}&navigate=yes";
-                } else {
-                    $url = "https://waze.com/ul?q={$encodedAddress}";
+                    return "https://waze.com/ul?q={$encodedAddress}&navigate=yes";
                 }
-            } else {
-                // Desktop -> Google Maps
-                if ($type === 'route') {
-                    $url = "https://www.google.com/maps/dir/?api=1&destination={$encodedAddress}&travelmode=driving";
-                } else {
-                    $url = "https://www.google.com/maps/search/?api=1&query={$encodedAddress}";
-                }
+                return "https://waze.com/ul?q={$encodedAddress}";
             }
 
-            return $returnTag ? "<a href=\"{$url}\" target=\"_blank\" rel=\"noopener noreferrer\">{$address}</a>" : $url;
+            // Default: Google Maps
+            if ($type === 'route') {
+                return "https://www.google.com/maps/dir/?api=1&destination={$encodedAddress}&travelmode=driving";
+            }
+
+            return "https://www.google.com/maps/search/?api=1&query={$encodedAddress}";
         }
     }
 
@@ -709,13 +835,13 @@
 
             // Day labels with translation support
             $days = [
-                'monday'    => __('Monday', 'gerendashaz'),
-                'tuesday'   => __('Tuesday', 'gerendashaz'),
-                'wednesday' => __('Wednesday', 'gerendashaz'),
-                'thursday'  => __('Thursday', 'gerendashaz'),
-                'friday'    => __('Friday', 'gerendashaz'),
-                'saturday'  => __('Saturday', 'gerendashaz'),
-                'sunday'    => __('Sunday', 'gerendashaz'),
+                'monday'    => __('Monday', 'nagyigen2026'),
+                'tuesday'   => __('Tuesday', 'nagyigen2026'),
+                'wednesday' => __('Wednesday', 'nagyigen2026'),
+                'thursday'  => __('Thursday', 'nagyigen2026'),
+                'friday'    => __('Friday', 'nagyigen2026'),
+                'saturday'  => __('Saturday', 'nagyigen2026'),
+                'sunday'    => __('Sunday', 'nagyigen2026'),
             ];
 
             $result = [];
@@ -842,11 +968,11 @@
             if ( $atts['label'] === 'true' ) {
                 switch ( $status ) {
                     case 'open':
-                        return '<span class="shop-status open">' . __('We are open! 🟢', 'gerendashaz') . '</span>';
+                        return '<span class="shop-status open">' . __('We are open! 🟢', 'nagyigen2026') . '</span>';
                     case 'closing_soon':
-                        return '<span class="shop-status closing-soon">' . __('Closing soon 🕒', 'gerendashaz') . '</span>';
+                        return '<span class="shop-status closing-soon">' . __('Closing soon 🕒', 'nagyigen2026') . '</span>';
                     default:
-                        return '<span class="shop-status closed">' . __('Closed 🔴', 'gerendashaz') . '</span>';
+                        return '<span class="shop-status closed">' . __('Closed 🔴', 'nagyigen2026') . '</span>';
                 }
             }
 

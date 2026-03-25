@@ -38,7 +38,7 @@
                             $('#cf_response').html('<div class="alert alert-info">'+contact_form_ajax_object.msg_sending+'</div>');
                         },
 
-                        success: function(response){
+                        success: function(response) {
                             if(response && typeof response === 'object'){
                                 if(response.success){
                                     var message = response.data && response.data.message ? response.data.message : contact_form_ajax_object.msg_success;
@@ -64,7 +64,7 @@
                             }
                         },
 
-                        error: function(xhr, status, error){
+                        error: function(xhr, status, error) {
                             var errMsg = contact_form_ajax_object.msg_network_error;
                             if(xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message){
                                 errMsg = xhr.responseJSON.data.message;

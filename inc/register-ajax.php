@@ -11,6 +11,40 @@
         error_log( 'Directory does not exist: ' . $ajax_dir );
     }
 
+    if ( ! function_exists( 'add_defer_to_ajax_scripts' ) ) {
+        /**
+         * Add the "defer" attribute to specific AJAX scripts.
+         *
+         * This function hooks into the `script_loader_tag` filter and modifies
+         * the script tag for certain enqueued scripts so that they load with the
+         * `defer` attribute. Deferred scripts do not block HTML parsing and
+         * execute after the document has been parsed.
+         *
+         * @param string $tag    The original HTML <script> tag.
+         * @param string $handle The script handle passed to wp_enqueue_script().
+         * @param string $src    The URL to the script.
+         * @return string Modified <script> tag with defer attribute if applicable.
+         */
+        function add_defer_to_ajax_scripts( $tag, $handle, $src ) {
+            // List of your script handles that should be deferred
+            $defer_scripts = array(
+                'comment_form_ajax_script',
+                'complaint_report_form_ajax_script',
+                'mc_form_ajax_script',
+            );
+
+            if ( in_array( $handle, $defer_scripts, true ) ) {
+                // Only add defer if it isn't already present
+                if ( false === strpos( $tag, ' defer' ) ) {
+                    $tag = str_replace( ' src=', ' defer src=', $tag );
+                }
+            }
+
+            return $tag;
+        }
+        add_filter( 'script_loader_tag', 'add_defer_to_ajax_scripts', 10, 3 );
+    }
+
     if ( ! function_exists( 'enqueue_comment_form_ajax_scripts' ) ) {
         function enqueue_comment_form_ajax_scripts() {
             $script_rel_path = '/ajax/js/comment_form_ajax.js'; // relative to theme root

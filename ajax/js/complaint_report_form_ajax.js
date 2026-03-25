@@ -7,7 +7,7 @@
             e.preventDefault();
 
             // Check if privacy checkbox is checked
-            if( !$('#crf_privacy_policy').is(':checked') ){
+            if (!$('#crf_privacy_policy').is(':checked')) {
                 $('#crf_response').html('<div class="alert alert-danger">'+complaint_report_form_ajax_object.msg_privacy_required+'</div>');
                 return; // stop submission
             }
@@ -30,7 +30,7 @@
                     formData.append('recaptcha_token', token);
 
                     // Append Dropzone files if any
-                    if(dzInstance) {
+                    if (dzInstance) {
                         dzInstance.files.forEach(file => {
                             formData.append('crf_files[]', file);
                             //console.log(file);
@@ -51,13 +51,13 @@
                             $('#crf_response').html('<div class="alert alert-info">'+complaint_report_form_ajax_object.msg_sending+'</div>');
                         },
 
-                        success: function(response){
-                            if(response && typeof response === 'object'){
-                                if(response.success){
+                        success: function(response) {
+                            if (response && typeof response === 'object') {
+                                if (response.success) {
                                     var message = response.data && response.data.message ? response.data.message : complaint_report_form_ajax_object.msg_success;
                                     $('#crf_response').html('<div class="alert alert-success">'+message+'</div>');
 
-                                    if(response.data.redirect_url){
+                                    if (response.data.redirect_url) {
                                         // Grab values from response
                                         var message_id = response.data.message_id ? response.data.message_id : '';
 
@@ -77,11 +77,11 @@
                             }
                         },
 
-                        error: function(xhr, status, error){
+                        error: function(xhr, status, error) {
                             var errMsg = complaint_report_form_ajax_object.msg_network_error;
-                            if(xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message){
+                            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
                                 errMsg = xhr.responseJSON.data.message;
-                            } else if(error){
+                            } else if (error) {
                                 errMsg += ' (' + error + ')';
                             }
                             $('#crf_response').html('<div class="alert alert-danger">'+errMsg+'</div>');

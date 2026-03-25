@@ -93,6 +93,7 @@
                     'allow'           => true,
                     'loading'         => true,
                     'style'           => true,
+                    'title'           => true,
                 ],
             ];
             $spotify_embed = wp_kses($spotify_playlist, $allowed_iframe);
@@ -243,7 +244,7 @@
                                     
                                     <?php if (shortcode_exists('site_address')) : ?>
                                         <li class="nav__item">
-                                            <a href="<?php echo get_location_link(do_shortcode('[site_address]'), 'route', false); ?>" target="_blank" class="nav__link">
+                                            <a href="<?php echo esc_url( get_address_url( do_shortcode('[site_address]'), 'route', 'waze' ) ); ?>" target="_blank" class="nav__link">
                                                 <svg class="icon icon-circle-location-arrow"><use xlink:href="#icon-circle-location-arrow"></use></svg>
                                                 <span>
                                                     <?php echo do_shortcode('[site_address]'); ?><br>

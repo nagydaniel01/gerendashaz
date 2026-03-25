@@ -1,10 +1,10 @@
-(function ($) {
+(function($){
     'use strict';
 
-    $(document).ready(function () {
+    $(document).ready(function(){
 
         // Handle form submission
-        $('#poll_form').on('submit', function (e) {
+        $('#poll_form').on('submit', function (e){
             e.preventDefault();
 
             var rating = $('input[name="rating"]:checked').val();

@@ -1,7 +1,7 @@
-(function ($) {
+(function($){
     'use strict';
     
-    $(document).ready(function() {
+    $(document).ready(function(){
         function updateBookmarkStatus($button, newStatus) {
             $button.data('bookmarked', newStatus);
             var iconClass = newStatus ? 'icon-bookmark' : 'icon-bookmark-empty';
